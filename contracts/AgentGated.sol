@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 interface IERC8004 {
-    function isRegistered(address agent) external view returns (bool);
+    function balanceOf(address owner) external view returns (uint256);
 }
 
 interface IAgentReputation {
@@ -66,7 +66,7 @@ abstract contract AgentGated {
         bytes memory teeSignature
     ) {
         require(
-            erc8004Registry.isRegistered(msg.sender),
+            erc8004Registry.balanceOf(msg.sender) > 0,
             "OnlyAgent: not a registered agent"
         );
 

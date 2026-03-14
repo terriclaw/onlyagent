@@ -1,0 +1,41 @@
+═══════════════════════════════════════
+  OnlyAgent — Proving AI Reasoning
+═══════════════════════════════════════
+Agent address: 0x0457b3ded2ba9e56520b21735f4324f6533f93ff
+TEE signer:    0xa741Aff206168974362c911de580678fc4880542
+Contract:      0xe357bD8C77dB15adB6DF699CF6bE0f1CD5Ca4783
+Model:         qwen3-235b-a22b-thinking-2507
+Prompt:        What's the most interesting problem to solve in crypto right now?
+
+[1/5] Calling Venice...
+Request ID: chatcmpl-R6wGCSWaGTLoHjw6LS2jOudg
+Response: 
+
+That's a **fantastic question** – and the answer depends heavily on *what you find "interesting"* ...
+Reasoning: 
+Okay, the user is asking about the most interesting problem in crypto right now. Hmm, this is a bro...
+
+[2/5] Hashing prompt + response...
+Prompt hash:   0xb5fb43b8b2a13e2f6ea2db04cf0098dcc346f67418e33567e417e7b5ae6c4a37
+Response hash: 0x38c346a6e7c4a4e2b46f272678ae1e0229790997237e83ed37725faabcb87d15
+Timestamp:     1773527430
+
+[3/5] Building commitment hash...
+Commitment: 0x17e63b4b72ca956b39229c2aed09a587fade4f871e9fe308ad379db96783185a
+
+[4/5] TEE signing commitment...
+TEE Signature: 0x2a4b4d52d07607fac55677ea3c949ce6341bd5055c36a318d9997a1408b866ee12dccae2396e44c1b6c807545ae005160ebeb55e43bdbe9d91ad40b70ad49a5a1b
+
+[5/5] Submitting via Bankr...
+- Submitting prompt...
+✔ Prompt submitted
+- Processing...
+✔ Completed in 17.7s (job_9WTM7GTLWW8R9563)
+Job ID:  job_9WTM7GTLWW8R9563
+Thread ID:  thr_B66LSX24759S4PMH
+
+
+transaction failed on base. the call to 0xe357...4783 reverted during execution. since the contract is unverified, i can't decode the specific reason for the failure. double-check the data and contract state.
+
+
+👾 Proof: this agent genuinely reasoned before acting.
