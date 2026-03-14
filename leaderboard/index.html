@@ -128,10 +128,10 @@
             return {
               address: addr,
               ens,
-              score: info.score.toNumber(),
-              totalActions: info.totalActions.toNumber(),
-              uniqueContracts: info.uniqueContracts.toNumber(),
-              lastActionAt: info.lastActionAt.toNumber()
+              score: info.score.toString(),
+              totalActions: info.totalActions.toString(),
+              uniqueContracts: info.uniqueContracts.toString(),
+              lastActionAt: info.lastActionAt.toString()
             };
           })
         );
