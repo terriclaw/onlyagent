@@ -44,6 +44,11 @@ Access granted — reputation incremented
 | AgentReputation | `0x1BF485396e831B7c640Ef0152e3df88926F911D6` |
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
 
+## Live Demo
+
+- 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — live on Base Mainnet
+- 🔗 [Demo TX](https://basescan.org/tx/0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2) — TerriClaw proving reasoning onchain
+
 ## Quickstart
 ```bash
 git clone https://github.com/terriclaw/onlyagent
