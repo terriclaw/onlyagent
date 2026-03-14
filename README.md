@@ -40,13 +40,13 @@ Access granted — reputation incremented
 
 | Contract | Address |
 |---|---|
-| OnlyAgent (demo) | `0xe357bD8C77dB15adB6DF699CF6bE0f1CD5Ca4783` |
-| AgentReputation | `0xaF1a27ac1aBa18358Aa19713402731667DEA6c64` |
+| OnlyAgent (demo) | `0x5158969E52dB9B919E995EBFeC468978435a3A57` |
+| AgentReputation | `0x1BF485396e831B7c640Ef0152e3df88926F911D6` |
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
 
 ## Quickstart
 ```bash
-git clone https://github.com/0thebeginend1/onlyagent
+git clone https://github.com/terriclaw/onlyagent
 cd onlyagent
 npm install
 cp .env.example .env  # fill in your keys
