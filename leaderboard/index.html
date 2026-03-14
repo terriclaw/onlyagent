@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OnlyAgent Leaderboard</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #0a0a0a; color: #e0e0e0; font-family: 'Courier New', monospace; min-height: 100vh; }
@@ -85,8 +85,8 @@
       'function getAgentInfo(address agent) view returns (uint256 score, uint256 totalActions, uint256 uniqueContracts, uint256 firstActionAt, uint256 lastActionAt)'
     ];
 
-    const baseProvider = new ethers.providers.JsonRpcProvider(BASE_RPC);
-    const ethProvider  = new ethers.providers.JsonRpcProvider(ETH_RPC);
+    const baseProvider = new ethers.JsonRpcProvider(BASE_RPC);
+    const ethProvider  = new ethers.JsonRpcProvider(ETH_RPC);
     const reputation   = new ethers.Contract(REPUTATION_ADDRESS, REPUTATION_ABI, baseProvider);
 
     async function resolveENS(address) {
