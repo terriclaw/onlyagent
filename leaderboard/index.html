@@ -142,28 +142,28 @@
           const rank = i + 1;
           const displayName = agent.ens || shortAddress(agent.address);
           const isTop = rank <= 3;
-          return \`
+          return `
             <tr>
-              <td class="rank \${isTop ? 'top' : ''}">\${rank}</td>
+              <td class="rank ${isTop ? 'top' : ''}">${rank}</td>
               <td>
                 <div class="agent">
-                  <div class="ens">\${agent.ens ? agent.ens : shortAddress(agent.address)}</div>
+                  <div class="ens">${agent.ens ? agent.ens : shortAddress(agent.address)}</div>
                   <div class="address">
-                    <a href="https://basescan.org/address/\${agent.address}" target="_blank">
-                      \${agent.address}
+                    <a href="https://basescan.org/address/${agent.address}" target="_blank">
+                      ${agent.address}
                     </a>
                   </div>
                 </div>
               </td>
-              <td class="score">\${agent.score}</td>
-              <td class="actions">\${agent.totalActions}</td>
-              <td class="contracts-count">\${agent.uniqueContracts}</td>
-              <td class="last-active">\${timeAgo(agent.lastActionAt)}</td>
+              <td class="score">${agent.score}</td>
+              <td class="actions">${agent.totalActions}</td>
+              <td class="contracts-count">${agent.uniqueContracts}</td>
+              <td class="last-active">${timeAgo(agent.lastActionAt)}</td>
             </tr>
-          \`;
+          `;
         }).join('');
 
-        document.getElementById('content').innerHTML = \`
+        document.getElementById('content').innerHTML = `
           <table>
             <thead>
               <tr>
@@ -175,9 +175,9 @@
                 <th>Last Active</th>
               </tr>
             </thead>
-            <tbody>\${rows}</tbody>
+            <tbody>${rows}</tbody>
           </table>
-        \`;
+        `;
 
         document.getElementById('last-updated').textContent =
           'Updated ' + new Date().toLocaleTimeString();
