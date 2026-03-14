@@ -91,8 +91,9 @@
 
     async function resolveENS(address) {
       try {
-        const name = await ethProvider.lookupAddress(address); console.log("ENS lookup:", address, "=>", name);
-        return name || null;
+        const res = await fetch(`https://api.ensideas.com/ens/resolve/${address}`);
+        const data = await res.json();
+        return data.name || null;
       } catch {
         return null;
       }
