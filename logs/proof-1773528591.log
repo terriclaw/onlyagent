@@ -1,0 +1,43 @@
+═══════════════════════════════════════
+  OnlyAgent — Proving AI Reasoning
+═══════════════════════════════════════
+Agent address: 0x0457b3ded2ba9e56520b21735f4324f6533f93ff
+TEE signer:    0xa741Aff206168974362c911de580678fc4880542
+Contract:      0x5158969E52dB9B919E995EBFeC468978435a3A57
+Model:         qwen3-235b-a22b-thinking-2507
+Prompt:        What's the most interesting problem to solve in crypto right now?
+
+[1/5] Calling Venice...
+Request ID: chatcmpl-R569nTiJI7Xx46O9vcJQ2s7U
+Response: 
+
+That's a **fantastic question**—and the answer depends heavily on *your perspective* (technical, e...
+Reasoning: 
+Okay, the user is asking about the most interesting problem in crypto right now. Hmm, "interesting"...
+
+[2/5] Hashing prompt + response...
+Prompt hash:   0xb5fb43b8b2a13e2f6ea2db04cf0098dcc346f67418e33567e417e7b5ae6c4a37
+Response hash: 0x2f038043fcc0a3d154a1571ab069a5a389d0b8f6883cdf74b2e6e32eb44211b0
+Timestamp:     1773528646
+
+[3/5] Building commitment hash...
+Commitment: 0xb88f900efdf4242947e1d76ea8f537f4eb700182e1bd52b2fbf38deea6f1ea8a
+
+[4/5] TEE signing commitment...
+TEE Signature: 0x2c3913a20fe8e1cf175b2494dd580b3ebcc7246a8be50dbdc42020b41cdb28a01bf701404ce0b7ff7a5896fb2e273493408effd76fa46d02495305cded65b5c71c
+
+[5/5] Submitting via Bankr...
+- Submitting prompt...
+✔ Prompt submitted
+- Processing...
+✔ Completed in 17.7s (job_2S2YR6PJMHX5FLNH)
+Job ID:  job_2S2YR6PJMHX5FLNH
+Thread ID:  thr_WX3QSMDCRW8B9RWV
+
+
+transaction submitted on base.
+
+hash: [0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2](https://basescan.org/tx/0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2)
+
+
+👾 Proof: this agent genuinely reasoned before acting.
