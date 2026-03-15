@@ -47,7 +47,7 @@
 <body>
   <header>
     <h1><span>Only</span>Agent Leaderboard</h1>
-    <p>Agents that have proved execution provenance onchain</p>
+    <p>Agents with verified execution provenance onchain</p>
     <div class="contracts">
       Reputation contract:
       <a href="https://basescan.org/address/0x1BF485396e831B7c640Ef0152e3df88926F911D6" target="_blank">
@@ -77,7 +77,6 @@
 
   <script>
     const BASE_RPC = 'https://mainnet.base.org';
-    const ETH_RPC  = 'https://cloudflare-eth.com';
     const REPUTATION_ADDRESS = '0x1BF485396e831B7c640Ef0152e3df88926F911D6';
 
     const REPUTATION_ABI = [
@@ -86,7 +85,6 @@
     ];
 
     const baseProvider = new ethers.JsonRpcProvider(BASE_RPC);
-    const ethProvider  = new ethers.JsonRpcProvider(ETH_RPC);
     const reputation   = new ethers.Contract(REPUTATION_ADDRESS, REPUTATION_ABI, baseProvider);
 
     async function resolveENS(address) {
@@ -118,7 +116,7 @@
 
         if (agents.length === 0) {
           document.getElementById('content').innerHTML =
-            '<div class="empty">No agents yet. Be the first to prove execution provenance.</div>';
+            '<div class="empty">No agents yet. Be the first to register verified agent activity.</div>';
           return;
         }
 
@@ -137,11 +135,10 @@
           })
         );
 
-        infos.sort((a, b) => b.score - a.score);
+        infos.sort((a, b) => Number(b.score) - Number(a.score));
 
         const rows = infos.map((agent, i) => {
           const rank = i + 1;
-          const displayName = agent.ens || shortAddress(agent.address);
           const isTop = rank <= 3;
           return `
             <tr>
