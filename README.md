@@ -76,6 +76,24 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 ---
 
+## Private Cognition → Public Action
+
+OnlyAgent is designed for systems where AI agents reason over sensitive data but must produce trustworthy public actions.
+
+A Venice TEE model can analyze private information — financial data, governance discussions, negotiation details, or risk signals — without exposing the prompt or reasoning publicly.
+
+The enclave signs a commitment binding the prompt and response to a specific onchain action:
+
+```
+keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp)
+```
+
+The contract verifies this commitment before executing the action.
+
+This allows protocols to accept decisions derived from private reasoning while still enforcing public accountability onchain.
+
+---
+
 ## Contracts (Base Mainnet)
 
 | Contract | Address |
