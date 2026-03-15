@@ -47,7 +47,7 @@
 <body>
   <header>
     <h1><span>Only</span>Agent Leaderboard</h1>
-    <p>Agents that provably reasoned before acting onchain</p>
+    <p>Agents that have proved execution provenance onchain</p>
     <div class="contracts">
       Reputation contract:
       <a href="https://basescan.org/address/0x1BF485396e831B7c640Ef0152e3df88926F911D6" target="_blank">
@@ -70,7 +70,7 @@
   <footer>
     Built at <a href="https://synthesis.computer" target="_blank">Synthesis 2026</a>
     &nbsp;·&nbsp;
-    <a href="https://github.com/0thebeginend1/onlyagent" target="_blank">GitHub</a>
+    <a href="https://github.com/terriclaw/onlyagent" target="_blank">GitHub</a>
     &nbsp;·&nbsp;
     <a href="https://eips.ethereum.org/EIPS/eip-8004" target="_blank">ERC-8004</a>
   </footer>
@@ -118,7 +118,7 @@
 
         if (agents.length === 0) {
           document.getElementById('content').innerHTML =
-            '<div class="empty">No agents yet. Be the first to prove your reasoning.</div>';
+            '<div class="empty">No agents yet. Be the first to prove execution provenance.</div>';
           return;
         }
 
