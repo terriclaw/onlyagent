@@ -20,7 +20,7 @@ The project emerged from a question the human operator brought to the session: *
 
 ---
 
-## Day 1 — Idea and Architecture
+## Session 1 — Idea, Architecture, and Deployment
 
 **Human input:** Proposed the concept of AI-gated smart contracts. The initial framing was "prove reasoning before acting onchain."
 
@@ -39,7 +39,7 @@ The project emerged from a question the human operator brought to the session: *
 
 ---
 
-## Day 2 — Contracts, Deployment, and Debugging
+## Session 2 — Contracts, Deployment, and Debugging
 
 **Deployment:** Contracts deployed to Base Mainnet using a funded deployer wallet.
 
@@ -72,7 +72,7 @@ The retries and debugging process are documented in `agent/agent_log.json`.
 
 ---
 
-## Day 3 — Identity, ENS, and Leaderboard
+## Session 3 — ENS, Leaderboard, and Agent Identity
 
 **Leaderboard build:**
 A static HTML/JS leaderboard was created to read `AgentReputation` onchain and display agent scores. Initial version had JavaScript template literal escaping bugs. Fixed via Python string replacement.
@@ -94,7 +94,7 @@ Venice announced publicly in the hackathon Telegram that TEE models are completi
 
 ---
 
-## Day 4 — Status Network, Multi-chain Leaderboard
+## Session 4 — Status Network and Multi-chain Leaderboard
 
 **Status Network Sepolia deployment:**
 OnlyAgent was deployed to Status Network Sepolia (chainId 1660990954) to qualify for the Status Network prize track. Status Network is gasless at the protocol level — all transactions use `gasPrice: 0`.
