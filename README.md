@@ -1,40 +1,68 @@
 # OnlyAgent
 
-**A smart contract access control primitive that proves an AI agent genuinely reasoned before executing an onchain transaction.**
+**A smart contract primitive that verifies an action was produced by a specific AI agent reasoning over a specific input.**
 
-OnlyAgent combines ERC-8004 agent identity with Venice AI TEE response signing to create a new class of onchain permission: not just *who* is calling, but *that they actually thought about it*.
+---
 
-## The Problem
+## The Primitive
 
-Any wallet can call any smart contract. There's no way to verify that an AI agent actually reasoned before acting — it could be a script, a bot, or a compromised agent blindly executing instructions.
+Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an AI agent that genuinely deliberated before acting.
 
-## The Solution
+`onlyAgent` is a Solidity modifier that changes this. Before a function executes, it verifies:
 
-The `onlyAgent` modifier requires three things before a transaction goes through:
+1. **ERC-8004 identity** — the caller is a registered onchain agent, not an arbitrary wallet
+2. **Reasoning commitment** — a TEE-signed hash binding this specific prompt and response to this specific agent, contract, and timestamp
+3. **Freshness** — the proof was generated within the last 2 minutes, preventing replay
 
-1. **ERC-8004 registration** — the caller is a verified onchain agent identity
-2. **Venice AI reasoning** — the agent called Venice and got a real response
-3. **TEE signature** — the commitment is signed by a trusted execution environment, binding the reasoning to this specific agent, contract, and timestamp
+No proof, no access.
 
-No reasoning, no access.
+---
 
-## How It Works
+## What Gets Verified Onchain
+
+The TEE signs a commitment hash:
 ```
-Agent calls Venice AI with a prompt
-        ↓
-Venice TEE signs the response (Intel TDX enclave)
-        ↓
-Agent builds commitment:
-  keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp)
-        ↓
-Smart contract verifies:
-  ✓ ERC-8004 registered agent
-  ✓ Proof not expired (2 min window)
-  ✓ Commitment not replayed
-  ✓ TEE signature from trusted provider
-        ↓
-Access granted — reputation incremented
+keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp)
 ```
+
+The contract verifies all five fields. This means the TEE is not just attesting *"an agent authorized this action"* — it is attesting *"this specific agent, reasoning from this specific prompt, produced this specific response, targeting this specific contract, at this specific time."*
+
+The contract does not read the prompt or response text — it sees hashes. But those hashes are binding. Store the preimages offchain and you can prove to anyone exactly what reasoning produced the action. The chain commits to it.
+
+---
+
+## The Trust Chain
+```
+Venice AI — Intel TDX enclave
+↓
+signs keccak256(promptHash + responseHash + agentAddress + contractAddress + timestamp)
+↓
+ERC-8004 registered agent identity
+↓
+onlyAgent modifier:
+  ✓ caller is ERC-8004 registered (balanceOf > 0)
+  ✓ proof is fresh (within 2 minute window)
+  ✓ TEE signature is from trusted provider
+↓
+function executes
+↓
+AgentReputation: score incremented, contract interaction logged
+```
+
+---
+
+## A New EVM Permission Layer
+
+`onlyAgent` adds a fourth actor to the EVM permission model:
+```
+onlyOwner   → human governance
+onlyAgent   → verified autonomous AI execution
+public      → open access
+```
+
+Protocols can treat autonomous agents differently from humans — with their own access tiers, reputation, and accountability — using nothing but a modifier.
+
+---
 
 ## Contracts (Base Mainnet)
 
@@ -44,27 +72,26 @@ Access granted — reputation incremented
 | AgentReputation | `0x1BF485396e831B7c640Ef0152e3df88926F911D6` |
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
 
+---
+
 ## Live Demo
 
-- 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — live on Base Mainnet
-- 🔗 [Demo TX](https://basescan.org/tx/0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2) — TerriClaw proving reasoning onchain
+- 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved reasoning onchain
+- 🔗 [Demo TX](https://basescan.org/tx/0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2) — TerriClaw (terriclaw.terricola.eth) calling prove() on Base Mainnet
 
-## Quickstart
-```bash
-git clone https://github.com/terriclaw/onlyagent
-cd onlyagent
-npm install
-cp .env.example .env  # fill in your keys
-node scripts/agent.js "Should I execute this transaction? Reason carefully."
-```
+---
 
 ## Use In Your Own Contract
-```solidity
+
+\`\`\`solidity
 import "./contracts/AgentGated.sol";
 
 contract MyContract is AgentGated {
-    constructor(address erc8004Registry, address reputation, address[] memory teeProviders)
-        AgentGated(erc8004Registry, reputation, teeProviders) {}
+    constructor(
+        address erc8004Registry,
+        address reputation,
+        address[] memory teeProviders
+    ) AgentGated(erc8004Registry, reputation, teeProviders) {}
 
     function myAction(
         bytes32 promptHash,
@@ -78,57 +105,78 @@ contract MyContract is AgentGated {
         // only verified AI agents can reach here
     }
 }
-```
+\`\`\`
+
+Every verified call increments the agent's score in AgentReputation, tracked by ERC-8004 identity across every contract that inherits AgentGated.
+
+---
+
+## Quickstart
+
+\`\`\`bash
+git clone https://github.com/terriclaw/onlyagent
+cd onlyagent
+npm install
+cp .env.example .env
+node scripts/agent.js "Should I execute this transaction? Reason carefully."
+\`\`\`
+
+---
+
+## Venice TEE
+
+OnlyAgent is built for Venice AI's TEE response signing (Intel TDX). Venice is the only mainstream LLM provider with Ethereum-compatible enclave signing — every TEE response includes a signing_address verifiable onchain via ecrecover.
+
+The current deployment uses a mock TEE signer. When Venice TEE ships:
+
+1. Swap model to tee-qwen3-235b-a22b-thinking-2507 in scripts/agent.js
+2. Call addTEEProvider(veniceSigningAddress) on your contract
+
+Zero other changes needed.
+
+---
 
 ## Reputation
 
-Every verified call increments the agent's score in `AgentReputation`. The registry tracks:
+AgentReputation tracks per-agent, per-identity:
+
 - Total actions
 - Unique contracts interacted with
 - First and last action timestamps
 
-Reputation is tied to the ERC-8004 identity — it follows the agent across every contract that uses `AgentGated`.
+Reputation follows the ERC-8004 identity across every contract that uses AgentGated — not just OnlyAgent's demo contract.
 
-## Venice TEE
-
-OnlyAgent is built for Venice AI's TEE response signing (Intel TDX). Venice is the only mainstream LLM provider with Ethereum-compatible enclave signing — every TEE response includes a `signing_address` you can verify onchain with `ecrecover`.
-
-The current deployment uses a mock TEE signer. When Venice TEE goes public:
-1. Swap model to `tee-qwen3-235b-a22b-thinking-2507` in `scripts/agent.js`
-2. Call `addTEEProvider(veniceSigningAddress)` on your contract
-
-Zero other changes needed.
-
-## OpenClaw Skill
-
-TerriClaw (an ERC-8004 registered agent) can demo OnlyAgent directly via the bundled OpenClaw skill in `skills/onlyagent-demo/`.
+---
 
 ## Project Structure
-```
+
+\`\`\`
 contracts/
-  AgentGated.sol        # abstract base — import this in your contract
+  AgentGated.sol        # abstract base — inherit this in your contract
   AgentReputation.sol   # onchain reputation registry
-  OnlyAgent.sol         # demo contract
+  OnlyAgent.sol         # demo contract with prove()
 scripts/
-  agent.js              # end-to-end proof flow
+  agent.js              # end-to-end proof pipeline
   deploy.js             # deployment script
 skills/
-  onlyagent-demo/       # OpenClaw skill for TerriClaw demo
+  onlyagent-demo/       # OpenClaw skill — lets TerriClaw run the demo
   onlyagent/            # OpenClaw SDK skill for other agents
-leaderboard/            # agent reputation leaderboard UI
-agent/                  # TerriClaw ERC-8004 identity
-```
+leaderboard/            # live agent reputation UI (GitHub Pages)
+\`\`\`
+
+---
 
 ## Environment Variables
-```bash
-VENICE_API_KEY=          # Venice API key
-AGENT_ADDRESS=           # your ERC-8004 registered agent wallet address
-TEE_SIGNER_PRIVATE_KEY=  # mock TEE signer only — when Venice TEE ships, use addTEEProvider(veniceSigningAddress) instead
-ONLY_AGENT_ADDRESS=      # deployed OnlyAgent contract address
-BASE_RPC_URL=            # Base RPC (default: https://mainnet.base.org)
-```
 
-## Hackathon
+\`\`\`bash
+VENICE_API_KEY=           # Venice API key
+AGENT_ADDRESS=            # ERC-8004 registered agent wallet address
+TEE_SIGNER_PRIVATE_KEY=   # mock only — replace with addTEEProvider(veniceSigningAddress) when TEE ships
+ONLY_AGENT_ADDRESS=       # deployed OnlyAgent contract
+AGENT_REPUTATION_ADDRESS= # deployed AgentReputation contract
+BASE_RPC_URL=             # Base RPC (default: https://mainnet.base.org)
+\`\`\`
+
+---
 
 Built at [Synthesis](https://synthesis.computer) 2026.
-Targeting Venice, Protocol Labs, and ENS prize tracks.
