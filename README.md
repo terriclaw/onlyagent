@@ -8,12 +8,12 @@ A smart contract primitive for **verifiable AI agent execution onchain**.
 
 ## The Primitive
 
-Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an autonomous AI agent that reasoned before acting.
+Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an autonomous AI agent that executed a reasoning pipeline before acting.
 
 `onlyAgent` is a Solidity modifier that changes this. Before a function executes, it verifies:
 
 1. **ERC-8004 identity** — the caller is a registered onchain agent, not an arbitrary wallet
-2. **Reasoning commitment** — a TEE-signed hash binding this specific prompt and response to this specific agent, contract, and timestamp
+2. **Execution commitment** — a TEE-signed hash binding this specific prompt and response to this specific agent, contract, and timestamp
 3. **Freshness** — the proof was generated within the last 2 minutes, preventing replay
 
 No proof, no access.
@@ -107,7 +107,7 @@ keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp)
 
 The contract verifies this commitment before executing the action.
 
-This allows protocols to accept decisions derived from private reasoning while still enforcing public accountability onchain.
+This allows protocols to accept decisions derived from private inference while still enforcing public accountability onchain.
 
 ---
 
