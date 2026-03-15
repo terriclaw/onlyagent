@@ -155,13 +155,14 @@
 
         if (allEntries.length === 0) {
           document.getElementById("content").innerHTML =
-            "<div class="empty">No agents yet. Be the first to register verified agent activity.</div>";
+            "<div class='empty'>No agents yet. Be the first to register verified agent activity.</div>";
           return;
         }
 
         const agentMap = {};
         for (const entry of allEntries) {
           const addr = entry.address.toLowerCase();
+          if (!agentMap[addr]) {
             agentMap[addr] = { address: entry.address, score: 0, totalActions: 0, uniqueContracts: 0, lastActionAt: 0, chains: [] };
           }
           agentMap[addr].score += entry.score;
@@ -201,7 +202,7 @@
         document.getElementById("last-updated").textContent = "Updated " + new Date().toLocaleTimeString();
 
       } catch (err) {
-        document.getElementById("content").innerHTML = "<div class="empty">Error: " + err.message + "</div>";
+        document.getElementById("content").innerHTML = "<div class='empty'>Error: " + err.message + "</div>";
       }
     }
 
