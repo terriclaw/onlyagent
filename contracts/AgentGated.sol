@@ -16,6 +16,9 @@ interface IAgentReputation {
     );
 }
 
+// onlyOwner  → human governance
+// onlyKeeper → automated keeper network
+// onlyAgent  → verified AI execution provenance
 abstract contract AgentGated {
     address public owner;
     IERC8004 public immutable erc8004Registry;
