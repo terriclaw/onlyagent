@@ -1,6 +1,8 @@
 # OnlyAgent
 
-**A smart contract primitive that verifies an action was produced by a specific AI agent execution bound to a specific prompt and response.**
+A smart contract primitive for **verifiable AI agent execution onchain**.
+
+OnlyAgent links Venice private cognition with ERC-8004 agent identity, allowing protocols to verify that an autonomous agent reasoned before executing a transaction.
 
 Venice provides private cognition. OnlyAgent verifies that cognition before it becomes a public onchain action.
 
