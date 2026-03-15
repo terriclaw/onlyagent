@@ -2,6 +2,8 @@
 
 **A smart contract primitive that verifies an action was produced by a specific AI agent execution bound to a specific prompt and response.**
 
+Venice provides private cognition. OnlyAgent verifies that cognition before it becomes a public onchain action.
+
 ---
 
 ## The Primitive
