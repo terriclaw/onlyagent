@@ -172,6 +172,16 @@ node scripts/agent.js "Should I execute this transaction? Reason carefully."
 
 ---
 
+## Bankr Autonomous Execution
+
+TerriClaw executes transactions using the Bankr wallet system.
+
+The agent does not hold a private key. Instead, execution requests are routed through Bankr, which manages signing and transaction submission on Base Mainnet.
+
+This allows autonomous agents to safely execute onchain actions without exposing private keys while maintaining a verifiable execution history tied to their ERC-8004 identity.
+
+---
+
 ## Venice TEE
 
 OnlyAgent is built for Venice AI's TEE response signing (Intel TDX). Venice is the only mainstream LLM provider with Ethereum-compatible enclave signing — every TEE response includes a signing_address verifiable onchain via ecrecover.
