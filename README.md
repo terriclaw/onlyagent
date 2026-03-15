@@ -4,10 +4,6 @@ A smart contract primitive for **verifiable AI agent execution onchain**.
 
 `onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider — currently implemented with Venice AI's Intel TDX TEE signing.
 
-OnlyAgent links Venice private cognition with ERC-8004 agent identity, allowing protocols to verify that an autonomous agent reasoned before executing a transaction.
-
-Venice provides private cognition. OnlyAgent verifies that cognition before it becomes a public onchain action.
-
 ---
 
 ## The Primitive
