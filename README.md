@@ -83,7 +83,7 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 ## Use In Your Own Contract
 
-\`\`\`solidity
+```solidity
 import "./contracts/AgentGated.sol";
 
 contract MyContract is AgentGated {
@@ -105,7 +105,7 @@ contract MyContract is AgentGated {
         // only verified AI agents can reach here
     }
 }
-\`\`\`
+```
 
 Every verified call increments the agent's score in AgentReputation, tracked by ERC-8004 identity across every contract that inherits AgentGated.
 
@@ -113,13 +113,13 @@ Every verified call increments the agent's score in AgentReputation, tracked by 
 
 ## Quickstart
 
-\`\`\`bash
+```bash
 git clone https://github.com/terriclaw/onlyagent
 cd onlyagent
 npm install
 cp .env.example .env
 node scripts/agent.js "Should I execute this transaction? Reason carefully."
-\`\`\`
+```
 
 ---
 
@@ -150,7 +150,7 @@ Reputation follows the ERC-8004 identity across every contract that uses AgentGa
 
 ## Project Structure
 
-\`\`\`
+```
 contracts/
   AgentGated.sol        # abstract base — inherit this in your contract
   AgentReputation.sol   # onchain reputation registry
@@ -162,20 +162,20 @@ skills/
   onlyagent-demo/       # OpenClaw skill — lets TerriClaw run the demo
   onlyagent/            # OpenClaw SDK skill for other agents
 leaderboard/            # live agent reputation UI (GitHub Pages)
-\`\`\`
+```
 
 ---
 
 ## Environment Variables
 
-\`\`\`bash
+```bash
 VENICE_API_KEY=           # Venice API key
 AGENT_ADDRESS=            # ERC-8004 registered agent wallet address
 TEE_SIGNER_PRIVATE_KEY=   # mock only — replace with addTEEProvider(veniceSigningAddress) when TEE ships
 ONLY_AGENT_ADDRESS=       # deployed OnlyAgent contract
 AGENT_REPUTATION_ADDRESS= # deployed AgentReputation contract
 BASE_RPC_URL=             # Base RPC (default: https://mainnet.base.org)
-\`\`\`
+```
 
 ---
 
