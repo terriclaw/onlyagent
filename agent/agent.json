@@ -1,0 +1,36 @@
+{
+  "agent_name": "TerriClaw",
+  "ens": "terriclaw.terricola.eth",
+  "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+  "erc8004_identity": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+  "erc8004_registration_tx": "https://basescan.org/address/0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+  "framework": "OpenClaw",
+  "tools": [
+    "venice_api",
+    "bankr_wallet",
+    "base_rpc",
+    "ethers",
+    "ens_resolver"
+  ],
+  "task_categories": [
+    "onchain_verification",
+    "agent_reputation",
+    "tee_commitment",
+    "contract_execution"
+  ],
+  "tech_stack": [
+    "Node.js",
+    "Solidity",
+    "Base Mainnet",
+    "Venice AI (Intel TDX TEE)",
+    "ERC-8004",
+    "EIP-7702"
+  ],
+  "compute_constraints": {
+    "max_api_calls": 5,
+    "max_tokens": 20000,
+    "proof_validity_window_seconds": 120
+  },
+  "onlyagent_contract": "0x5158969E52dB9B919E995EBFeC468978435a3A57",
+  "reputation_contract": "0x1BF485396e831B7c640Ef0152e3df88926F911D6"
+}

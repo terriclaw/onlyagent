@@ -1,0 +1,83 @@
+{
+  "task": "Prove AI execution provenance onchain via OnlyAgent",
+  "agent": "TerriClaw",
+  "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+  "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+  "run": 3,
+  "status": "success",
+  "steps": [
+    {
+      "step": 1,
+      "action": "discover",
+      "description": "Received task: prove reasoning before executing onchain transaction",
+      "tool": "openclaw_skill",
+      "result": "task_accepted"
+    },
+    {
+      "step": 2,
+      "action": "plan",
+      "description": "Decided to call Venice AI with reasoning prompt, then submit TEE commitment to OnlyAgent contract",
+      "tool": "internal",
+      "result": "plan_ready"
+    },
+    {
+      "step": 3,
+      "action": "execute",
+      "description": "Called Venice AI model qwen3-235b-a22b-thinking-2507",
+      "tool": "venice_api",
+      "model": "qwen3-235b-a22b-thinking-2507",
+      "prompt": "What's the most interesting problem to solve in crypto right now?",
+      "prompt_hash": "0xb5fb43b8b2a13e2f6ea2db04cf0098dcc346f67418e33567e417e7b5ae6c4a37",
+      "response_hash": "0x2f038043fcc0a3d154a1571ab069a5a389d0b8f6883cdf74b2e6e32eb44211b0",
+      "latency_ms": 2000,
+      "result": "response_received"
+    },
+    {
+      "step": 4,
+      "action": "execute",
+      "description": "Built commitment hash and obtained TEE signature",
+      "tool": "ethers",
+      "commitment": "0xb88f900efdf4242947e1d76ea8f537f4eb700182e1bd52b2fbf38deea6f1ea8a",
+      "tee_signer": "0xa741Aff206168974362c911de580678fc4880542",
+      "timestamp": 1773528646,
+      "result": "commitment_signed"
+    },
+    {
+      "step": 5,
+      "action": "verify",
+      "description": "Validated transaction parameters before submission: contract address, calldata, chainId",
+      "tool": "internal",
+      "contract": "0x5158969E52dB9B919E995EBFeC468978435a3A57",
+      "chain_id": 8453,
+      "result": "parameters_valid"
+    },
+    {
+      "step": 6,
+      "action": "submit",
+      "description": "Submitted transaction via Bankr wallet on Base Mainnet",
+      "tool": "bankr_wallet",
+      "job_id": "job_2S2YR6PJMHX5FLNH",
+      "result": "tx_submitted",
+      "duration_ms": 17700
+    },
+    {
+      "step": 7,
+      "action": "verify",
+      "description": "Confirmed transaction success and reputation increment on AgentReputation contract",
+      "tool": "base_rpc",
+      "tx_hash": "0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2",
+      "basescan": "https://basescan.org/tx/0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2",
+      "result": "confirmed"
+    }
+  ],
+  "final_output": {
+    "tx_hash": "0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2",
+    "reputation_score": 1,
+    "total_actions": 1,
+    "unique_contracts": 1
+  },
+  "total_duration_ms": 17700,
+  "tool_calls": 5,
+  "retries": 2,
+  "retry_reason": "ERC-8004 isRegistered interface mismatch on first two runs — fixed by switching to balanceOf check"
+}
