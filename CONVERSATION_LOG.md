@@ -8,6 +8,10 @@
 
 ---
 
+This document records the human–agent collaboration that produced OnlyAgent during The Synthesis hackathon. It captures design discussions, debugging steps, and the autonomous execution pipeline performed by the TerriClaw agent.
+
+---
+
 ## Overview
 
 OnlyAgent was developed collaboratively between a human operator and AI systems over the first days of the hackathon. The human led architecture decisions, deployment, and testing. Claude and ChatGPT assisted with design iteration, Solidity implementation, debugging, and documentation. TerriClaw executed the final onchain proof pipeline autonomously.
