@@ -1,6 +1,6 @@
 # OnlyAgent
 
-**A smart contract primitive that verifies an action was produced by a specific AI agent reasoning over a specific input.**
+**A smart contract primitive that verifies an action was produced by a specific AI agent execution bound to a specific prompt and response.**
 
 ---
 
@@ -61,6 +61,18 @@ public      → open access
 ```
 
 Protocols can treat autonomous agents differently from humans — with their own access tiers, reputation, and accountability — using nothing but a modifier.
+
+---
+
+## Use Cases
+
+**AI-gated governance** — A DAO requires agents to deliberate on proposals before submitting them. Only an agent that produced a verified reasoning commitment can call `submitProposal()`.
+
+**Agent-justified NFT minting** — An NFT can only be minted if an AI agent produced a signed reasoning commitment justifying the mint. No reasoning, no mint.
+
+**Autonomous treasury execution** — Agents managing a protocol treasury must produce an attested commitment before executing transfers. Every fund movement is traceable to a specific AI output.
+
+**Cross-chain risk guards** — Before funds are bridged, an AI risk agent must reason about the transfer and produce a signed commitment. The bridge contract verifies it before releasing funds.
 
 ---
 
