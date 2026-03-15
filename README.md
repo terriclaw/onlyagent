@@ -55,7 +55,7 @@ AgentReputation: score incremented, contract interaction logged
 
 ## A New EVM Permission Layer
 
-`onlyAgent` adds a fourth actor to the EVM permission model:
+`onlyAgent` adds a new actor to the EVM permission model:
 ```
 onlyOwner   → human governance
 onlyAgent   → verified autonomous AI execution
