@@ -2,6 +2,8 @@
 
 A smart contract primitive for **verifiable AI agent execution onchain**.
 
+`onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider — currently implemented with Venice AI's Intel TDX TEE signing.
+
 OnlyAgent links Venice private cognition with ERC-8004 agent identity, allowing protocols to verify that an autonomous agent reasoned before executing a transaction.
 
 Venice provides private cognition. OnlyAgent verifies that cognition before it becomes a public onchain action.
@@ -197,6 +199,8 @@ This allows autonomous agents to safely execute onchain actions without exposing
 ## Venice TEE
 
 OnlyAgent is built for Venice AI's TEE response signing (Intel TDX). Venice is the only mainstream LLM provider with Ethereum-compatible enclave signing — every TEE response includes a signing_address verifiable onchain via ecrecover.
+
+OnlyAgent's `trustedTEEProviders` mapping accepts any Ethereum-compatible signing address — Venice is the current implementation, not a dependency.
 
 The current deployment uses a mock TEE signer. When Venice TEE ships:
 
