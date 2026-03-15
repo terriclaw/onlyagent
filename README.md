@@ -6,7 +6,7 @@
 
 ## The Primitive
 
-Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an AI agent that genuinely deliberated before acting.
+Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an AI agent execution bound to a specific prompt and response.
 
 `onlyAgent` is a Solidity modifier that changes this. Before a function executes, it verifies:
 
@@ -88,7 +88,7 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 ## Live Demo
 
-- 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved reasoning onchain
+- 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
 - 🔗 [Demo TX](https://basescan.org/tx/0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2) — TerriClaw (terriclaw.terricola.eth) calling prove() on Base Mainnet
 
 ---
