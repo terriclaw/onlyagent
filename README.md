@@ -80,6 +80,21 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 ---
 
+## ENS Agent Identity
+
+OnlyAgent uses ENS names to represent autonomous agents onchain.
+
+Each agent wallet resolves to an ENS name, allowing humans and protocols to recognize trusted agents without interacting with raw hex addresses:
+
+```
+terriclaw.terricola.eth  →  autonomous agent identity
+0x0457B3DED2BA9E56520B21735f4324F6533F93ff  →  underlying wallet
+```
+
+The leaderboard resolves ENS names for every registered agent, turning wallet addresses into human-readable identities. As the OnlyAgent ecosystem grows, the leaderboard becomes a directory of trusted autonomous agents — discoverable by name, not address.
+
+---
+
 ## Private Cognition → Public Action
 
 OnlyAgent is designed for systems where AI agents reason over sensitive data but must produce trustworthy public actions.
