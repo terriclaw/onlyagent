@@ -94,6 +94,35 @@ Venice announced publicly in the hackathon Telegram that TEE models are completi
 
 ---
 
+## Day 4 — Status Network, Multi-chain Leaderboard
+
+**Status Network Sepolia deployment:**
+OnlyAgent was deployed to Status Network Sepolia (chainId 1660990954) to qualify for the Status Network prize track. Status Network is gasless at the protocol level — all transactions use `gasPrice: 0`.
+
+**Technical challenge — EVM version mismatch:**
+Initial deployment failed with `invalid opcode: PUSH0`. Status Network does not support the Shanghai EVM upgrade (EIP-3855). Solidity 0.8.20+ emits `PUSH0` by default. Root cause: `hardhat.config.ts` was taking precedence over `hardhat.config.js`, ignoring the `evmVersion: "paris"` override. Fixed by updating `hardhat.config.ts` directly to target `paris` EVM. Recompiled clean and deployment succeeded.
+
+**MockERC8004:**
+The real ERC-8004 registry (`0x8004...`) is not deployed on Status Network Sepolia. Deployed a `MockERC8004` contract that returns `1` for every `balanceOf` call, allowing the `onlyAgent` modifier to pass on testnet without a real agent registry.
+
+**Gasless prove() TX:**
+`0xe97812a3c165059c9d751a7b953d9c1c481cd3fd2c88dc64c5acea4252b1f5ad`
+
+Note: Bankr does not work on Status Network. Transaction was submitted directly via ethers with the deployer private key. `prove-status.js` documents this distinction — agents running on Status Sepolia must bring a private key directly.
+
+**Deployed contracts (Status Network Sepolia):**
+- OnlyAgent: `0xBa9d89888F32Bce09D1Fc596FD25dc44ab7645C4`
+- AgentReputation: `0xB45c1e0Dc6b5d07ecCEDb9F7953e38Bad8f4BB9F`
+- MockERC8004: `0x5c83906a6d5BA16f60ca66a49c62e4586c86CBE6`
+
+**Multi-chain leaderboard:**
+Leaderboard updated to query AgentReputation on both Base Mainnet and Status Network Sepolia in parallel. Agents are merged by address — same identity on multiple chains gets a combined score. Chain badges show where each agent has been active. This makes the cross-chain nature of ERC-8004 identity visible: reputation follows the agent, not the network.
+
+**Skill updated:**
+`onlyagent-demo` skill updated to document both execution paths: Base Mainnet (via Bankr) and Status Network Sepolia (via direct private key signing).
+
+---
+
 ## Tools Used
 
 | Tool | Role |
@@ -105,6 +134,7 @@ Venice announced publicly in the hackathon Telegram that TEE models are completi
 | Bankr | TerriClaw's EIP-7702 smart wallet — handles signing without private key exposure |
 | Hardhat | Contract compilation and deployment |
 | Base Mainnet | Deployment target (chainId 8453) |
+| Status Network Sepolia | Gasless deployment target (chainId 1660990954) |
 
 ---
 
@@ -116,6 +146,8 @@ Venice announced publicly in the hackathon Telegram that TEE models are completi
 - Live leaderboard: https://terriclaw.github.io/onlyagent/leaderboard/
 - Demo TX: https://basescan.org/tx/0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2
 - Agent identity: `terriclaw.terricola.eth` — #1 on the leaderboard
+- Status Network Sepolia deployment: gasless `prove()` TX confirmed
+- Multi-chain leaderboard: Base Mainnet + Status Network Sepolia with chain badges
 
 The project establishes a new EVM permission primitive:
 ```
