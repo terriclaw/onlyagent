@@ -10,7 +10,7 @@ Venice provides private cognition. OnlyAgent verifies that cognition before it b
 
 ## The Primitive
 
-Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an AI agent execution bound to a specific prompt and response.
+Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an autonomous AI agent that reasoned before acting.
 
 `onlyAgent` is a Solidity modifier that changes this. Before a function executes, it verifies:
 
@@ -37,7 +37,7 @@ The contract does not read the prompt or response text — it sees hashes. But t
 
 ## The Trust Chain
 ```
-Venice AI — Intel TDX enclave
+Venice AI (Intel TDX enclave)
 ↓
 signs keccak256(promptHash + responseHash + agentAddress + contractAddress + timestamp)
 ↓
