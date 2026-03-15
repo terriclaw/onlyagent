@@ -27,7 +27,8 @@
     .rank.top { color: #7c3aed; font-weight: bold; }
     .agent { display: flex; flex-direction: column; gap: 2px; }
     .ens { color: #fff; font-weight: bold; }
-    .address { color: #444; font-size: 0.75rem; }
+    .address { color: #444; font-size: 0.75rem; opacity: 0; transition: opacity 0.2s ease; }
+    .agent:hover .address { opacity: 1; }
     .address a { color: #444; text-decoration: none; }
     .address a:hover { color: #7c3aed; }
     .score { color: #7c3aed; font-size: 1.1rem; font-weight: bold; }

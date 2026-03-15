@@ -10,6 +10,16 @@ const VENICE_URL      = "https://api.venice.ai/api/v1/chat/completions";
 const agentAddress = process.env.AGENT_ADDRESS;
 const teeSigner    = new ethers.Wallet(process.env.TEE_SIGNER_PRIVATE_KEY);
 
+async function resolveAgentENS(address) {
+  try {
+    const provider = new ethers.JsonRpcProvider('https://eth.llamarpc.com');
+    const name = await provider.lookupAddress(address);
+    return name || address;
+  } catch {
+    return address;
+  }
+}
+
 // ── CONTRACT ABI ──────────────────────────────────────────────────────────────
 const ABI = [
   "function prove(bytes32 promptHash, bytes32 responseHash, uint256 timestamp, bytes memory teeSignature) external returns (string memory)"
@@ -54,7 +64,8 @@ async function main() {
   console.log("═══════════════════════════════════════");
   console.log("  OnlyAgent — Proving AI Reasoning");
   console.log("═══════════════════════════════════════");
-  console.log("Agent address:", agentAddress);
+  const agentENS = await resolveAgentENS(agentAddress);
+  console.log("Agent:        ", agentENS === agentAddress ? agentAddress : `${agentENS} (${agentAddress})`);
   console.log("TEE signer:   ", teeSigner.address);
   console.log("Contract:     ", process.env.ONLY_AGENT_ADDRESS);
   console.log("Model:        ", VENICE_MODEL);
