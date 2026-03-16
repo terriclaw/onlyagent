@@ -115,8 +115,8 @@ This allows protocols to accept decisions derived from private inference while s
 
 | Contract | Address |
 |---|---|
-| OnlyAgent (demo) | `0xa592d5605Cb5a03CF8cf1f80d7848e98939B6258` |
-| AgentReputation | `0x7e765A6c3581e008fF91c0c7240c474b11E912a0` |
+| OnlyAgent (demo) | `0x2367Ea8321bC461AAa3C156D92C4cAd73f89F4c5` |
+| AgentReputation | `0x92d48F5375a86484706549C9fD71Ac3C62E98eb9` |
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
 
 ---
@@ -125,8 +125,8 @@ This allows protocols to accept decisions derived from private inference while s
 
 | Contract | Address |
 |---|---|
-| OnlyAgent | `0x5158969E52dB9B919E995EBFeC468978435a3A57` |
-| AgentReputation | `0x1BF485396e831B7c640Ef0152e3df88926F911D6` |
+| OnlyAgent | `0xaea2e6252093b25dbe151F613696162908bE987a` |
+| AgentReputation | `0xa592d5605Cb5a03CF8cf1f80d7848e98939B6258` |
 
 Deployed with `gasPrice: 0` — Status Network is gasless at the protocol level.
 
@@ -135,8 +135,8 @@ Deployed with `gasPrice: 0` — Status Network is gasless at the protocol level.
 ## Live Demo
 
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
-- 🔗 [Demo TX](https://basescan.org/tx/0x0f47d6109c1ad3cff2ed6b17ceeda65348edf61598172052c0a1fec6e8b2140f) — TerriClaw (terriclaw.terricola.eth) calling prove() on Base Mainnet
-- ⛽ [Gasless TX](https://sepoliascan.status.network/tx/0x860a5439d71544e8232eda8bfb2a1993987d3aefdb68ff472d8080238f42a7da) — prove() on Status Network Sepolia with gasPrice: 0
+- 🔗 [Demo TX](https://basescan.org/tx/0x057f04dc79798dcbfc3edad464c60640cf6ddd7564eee5449e0d7e25c8cbc34b) — TerriClaw (terriclaw.terricola.eth) calling prove() on Base Mainnet
+- ⛽ [Gasless TX](https://sepoliascan.status.network/tx/0x85e744df745a9587fe27379ef8fb663117a1cf48baa8758cd2cc151df547e539) — prove() on Status Network Sepolia with gasPrice: 0
 
 ---
 

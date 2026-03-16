@@ -46,7 +46,7 @@ async function main() {
 
   console.log("\nLinking contracts...");
   const rep = new ethers.Contract(reputationAddress, repArtifact.abi, deployer);
-  const linkTx = await rep.setAgentGatedContract(onlyAgentAddress, gasOpts);
+  const linkTx = await rep.addAgentGatedContract(onlyAgentAddress, gasOpts);
   await linkTx.wait();
   console.log("Linked!");
 

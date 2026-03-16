@@ -35,7 +35,7 @@ async function main() {
   // 3. Link AgentReputation to OnlyAgent
   console.log("\nLinking contracts...");
   const rep = new ethers.Contract(reputationAddress, repArtifact.abi, deployer);
-  await rep.setAgentGatedContract(onlyAgentAddress);
+  await rep.addAgentGatedContract(onlyAgentAddress);
   console.log("Linked!");
 
   console.log("\n--- DEPLOYMENT COMPLETE ---");

@@ -202,3 +202,35 @@ The system proves execution provenance of an AI inference tied to a transaction 
 
 **Leaderboard updated:**
 Both chain addresses updated to post-audit deployments.
+
+---
+
+## Session 6 — AgentReputation Architecture Fix and Redeployment
+
+**Issue identified:**
+`AgentReputation.sol` had a structural limitation — only a single `agentGatedContract` address could write reputation scores. This contradicted the README claim that "reputation follows the ERC-8004 identity across every contract that uses AgentGated."
+
+**Fixes applied to `AgentReputation.sol`:**
+- Replaced `address public agentGatedContract` with `mapping(address => bool) public authorizedAgentGatedContracts`
+- Added `addAgentGatedContract(address)` and `removeAgentGatedContract(address)` owner functions
+- Updated `onlyAgentGated` modifier to check the mapping instead of a single address
+- Replaced duplicate-prone `firstActionAt == 0` push guard with `knownAgents[agent]` check
+- Removed `resetScore()` — semantically incomplete due to inability to clear nested mapping
+
+**Redeployment to Base Mainnet:**
+- AgentReputation: `0x92d48F5375a86484706549C9fD71Ac3C62E98eb9`
+- OnlyAgent: `0x2367Ea8321bC461AAa3C156D92C4cAd73f89F4c5`
+- prove() TX: `0x057f04dc79798dcbfc3edad464c60640cf6ddd7564eee5449e0d7e25c8cbc34b`
+
+**Redeployment to Status Network Sepolia:**
+- AgentReputation: `0xa592d5605Cb5a03CF8cf1f80d7848e98939B6258`
+- OnlyAgent: `0xaea2e6252093b25dbe151F613696162908bE987a`
+- MockERC8004: `0x7e765A6c3581e008fF91c0c7240c474b11E912a0`
+- Gasless prove() TX: `0x85e744df745a9587fe27379ef8fb663117a1cf48baa8758cd2cc151df547e539`
+
+**Scripts updated:**
+- `scripts/deploy.js`, `scripts/deploy-status.js`, `scripts/link.js` — `setAgentGatedContract` → `addAgentGatedContract`
+
+**Additional cleanup:**
+- `agent.js` header banner updated: "Proving AI Reasoning" → "Proving AI Execution"
+- `agent.js` footer updated: "genuinely reasoned before acting" → "executed an attested inference before acting"

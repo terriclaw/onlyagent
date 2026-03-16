@@ -1,0 +1,45 @@
+═══════════════════════════════════════
+  OnlyAgent — Proving AI Reasoning
+═══════════════════════════════════════
+Agent:         0x0457b3ded2ba9e56520b21735f4324f6533f93ff
+TEE signer:    0xa741Aff206168974362c911de580678fc4880542
+Contract:      0x2367Ea8321bC461AAa3C156D92C4cAd73f89F4c5
+Model:         qwen3-235b-a22b-thinking-2507
+Prompt:        Demonstrate OnlyAgent on Base mainnet. Reason about the proving mechanism carefully.
+
+[1/5] Calling Venice...
+Request ID: chatcmpl-RhDRVVBmwSKSfg7YOuIU1xVl
+Response: 
+
+## Critical Clarification: "OnlyAgent" Does **Not** Exist on Base Mainnet
+
+**There is no known pro...
+Reasoning: 
+Okay, the user wants me to demonstrate OnlyAgent on Base mainnet and reason about the proving mecha...
+
+[2/5] Hashing prompt + response...
+Prompt hash:   0xd6eaa2be55bc5e1d3cf65c83f1b2f356578fe7fd1aea41e11007fdaee7978b98
+Response hash: 0xeb6e345979b0db224edb9fdc360c89933bcb769becc4ba70cb22289ed8f7604c
+Timestamp:     1773691850
+
+[3/5] Building commitment hash...
+Commitment: 0x6b5953ac3e783d910ea5d9052b053ff500bdbee011ffa79b16db55fce7213287
+
+[4/5] TEE signing commitment...
+TEE Signature: 0x18308fc55e33c2652090683aa2b57913a9b409301dc79712c727505f66cb844c7cd045144702e8cb0eecc70d77595d97a20f8a13ee0048c663758dbf0028b5131c
+
+[5/5] Submitting via Bankr...
+- Submitting prompt...
+✔ Prompt submitted
+- Processing...
+✔ Completed in 31.0s (job_DNM2SBR25NGASFJZ)
+Job ID:  job_DNM2SBR25NGASFJZ
+Thread ID:  thr_L53B5C3VP2SXKSMT
+
+
+transaction submitted on base.
+
+hash: [0x057f04dc79798dcbfc3edad464c60640cf6ddd7564eee5449e0d7e25c8cbc34b](https://basescan.org/tx/0x057f04dc79798dcbfc3edad464c60640cf6ddd7564eee5449e0d7e25c8cbc34b)
+
+
+👾 Proof: this agent genuinely reasoned before acting.

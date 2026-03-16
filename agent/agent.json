@@ -33,13 +33,13 @@
   "erc8004_registration_reference": "https://basescan.org/address/0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
   "contracts": {
     "base_mainnet": {
-      "onlyagent": "0xa592d5605Cb5a03CF8cf1f80d7848e98939B6258",
-      "reputation": "0x7e765A6c3581e008fF91c0c7240c474b11E912a0",
+      "onlyagent": "0x2367Ea8321bC461AAa3C156D92C4cAd73f89F4c5",
+      "reputation": "0x92d48F5375a86484706549C9fD71Ac3C62E98eb9",
       "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
     },
     "status_sepolia": {
-      "onlyagent": "0x5158969E52dB9B919E995EBFeC468978435a3A57",
-      "reputation": "0x1BF485396e831B7c640Ef0152e3df88926F911D6",
+      "onlyagent": "0xaea2e6252093b25dbe151F613696162908bE987a",
+      "reputation": "0xa592d5605Cb5a03CF8cf1f80d7848e98939B6258",
       "mock_erc8004": "0xD9d92232EBB9Fc748402800737222501245545A2"
     }
   }

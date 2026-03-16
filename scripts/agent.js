@@ -62,7 +62,7 @@ async function main() {
   const prompt = process.argv[2] || "Should I execute this onchain transaction? Assess the request and decide.";
 
   console.log("═══════════════════════════════════════");
-  console.log("  OnlyAgent — Proving AI Reasoning");
+  console.log("  OnlyAgent — Proving AI Execution");
   console.log("═══════════════════════════════════════");
   const agentENS = await resolveAgentENS(agentAddress);
   console.log("Agent:        ", agentENS === agentAddress ? agentAddress : `${agentENS} (${agentAddress})`);
@@ -108,7 +108,7 @@ async function main() {
   const bankrCmd = `bankr prompt "Submit this transaction on base: {\\"to\\": \\"${process.env.ONLY_AGENT_ADDRESS}\\", \\"data\\": \\"${calldata}\\", \\"value\\": \\"0\\", \\"chainId\\": 8453}"`;
   const result = execSync(bankrCmd).toString();
   console.log(result);
-  console.log("\n👾 Proof: this agent genuinely reasoned before acting.");
+  console.log("\n👾 Proof: this agent executed an attested inference before acting.");
 }
 
 main().catch(console.error);

@@ -142,5 +142,116 @@
     "total_duration_ms": 21600,
     "tool_calls": 4,
     "retries": 0
+  },
+  {
+    "task": "Prove attested AI execution on redesigned multi-writer AgentReputation \u2014 Base Mainnet",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+    "run": 5,
+    "status": "success",
+    "context": "First prove() after AgentReputation redesigned to support multiple writer contracts",
+    "steps": [
+      {
+        "step": 1,
+        "action": "execute",
+        "tool": "venice_api",
+        "model": "qwen3-235b-a22b-thinking-2507",
+        "prompt": "Demonstrate OnlyAgent on Base mainnet. Reason about the proving mechanism carefully.",
+        "prompt_hash": "0xd6eaa2be55bc5e1d3cf65c83f1b2f356578fe7fd1aea41e11007fdaee7978b98",
+        "response_hash": "0xeb6e345979b0db224edb9fdc360c89933bcb769becc4ba70cb22289ed8f7604c",
+        "latency_ms": 2000,
+        "result": "response_received"
+      },
+      {
+        "step": 2,
+        "action": "execute",
+        "tool": "ethers",
+        "commitment": "0x6b5953ac3e783d910ea5d9052b053ff500bdbee011ffa79b16db55fce7213287",
+        "tee_signer": "0xa741Aff206168974362c911de580678fc4880542",
+        "timestamp": 1773691850,
+        "chain_id": 8453,
+        "result": "commitment_signed"
+      },
+      {
+        "step": 3,
+        "action": "submit",
+        "tool": "bankr_wallet",
+        "job_id": "job_DNM2SBR25NGASFJZ",
+        "thread_id": "thr_L53B5C3VP2SXKSMT",
+        "contract": "0x2367Ea8321bC461AAa3C156D92C4cAd73f89F4c5",
+        "result": "tx_submitted",
+        "duration_ms": 31000
+      },
+      {
+        "step": 4,
+        "action": "verify",
+        "tool": "base_rpc",
+        "tx_hash": "0x057f04dc79798dcbfc3edad464c60640cf6ddd7564eee5449e0d7e25c8cbc34b",
+        "basescan": "https://basescan.org/tx/0x057f04dc79798dcbfc3edad464c60640cf6ddd7564eee5449e0d7e25c8cbc34b",
+        "result": "confirmed"
+      }
+    ],
+    "final_output": {
+      "tx_hash": "0x057f04dc79798dcbfc3edad464c60640cf6ddd7564eee5449e0d7e25c8cbc34b",
+      "contract": "0x2367Ea8321bC461AAa3C156D92C4cAd73f89F4c5"
+    },
+    "total_duration_ms": 31000,
+    "tool_calls": 4,
+    "retries": 0
+  },
+  {
+    "task": "Prove attested AI execution on redesigned multi-writer AgentReputation \u2014 Status Network Sepolia",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1",
+    "run": 6,
+    "status": "success",
+    "context": "Gasless prove() after AgentReputation redesigned to support multiple writer contracts",
+    "steps": [
+      {
+        "step": 1,
+        "action": "execute",
+        "tool": "venice_api",
+        "model": "qwen3-235b-a22b-thinking-2507",
+        "prompt_hash": "0x2b6e270ea374d95c043335f6060f0b4aa1c7dc94fbf0f6d20242eda2a9241690",
+        "response_hash": "0xb6f281ac3bd3fea9fc739a785b3bacce0841ac8a7a53e918f20e07d5484d3c8e",
+        "latency_ms": 2000,
+        "result": "response_received"
+      },
+      {
+        "step": 2,
+        "action": "execute",
+        "tool": "ethers",
+        "commitment": "0xde48ea8ea69ee2188f10e3954079fa3a80b660ac7f3cead1b0eccdaa9f5d77e5",
+        "tee_signer": "0xa741Aff206168974362c911de580678fc4880542",
+        "timestamp": 1773692360,
+        "chain_id": 1660990954,
+        "result": "commitment_signed"
+      },
+      {
+        "step": 3,
+        "action": "submit",
+        "tool": "direct_private_key",
+        "contract": "0xaea2e6252093b25dbe151F613696162908bE987a",
+        "gas_price": 0,
+        "result": "tx_submitted"
+      },
+      {
+        "step": 4,
+        "action": "verify",
+        "tool": "status_rpc",
+        "tx_hash": "0x85e744df745a9587fe27379ef8fb663117a1cf48baa8758cd2cc151df547e539",
+        "explorer": "https://sepoliascan.status.network/tx/0x85e744df745a9587fe27379ef8fb663117a1cf48baa8758cd2cc151df547e539",
+        "block": 17897584,
+        "result": "confirmed"
+      }
+    ],
+    "final_output": {
+      "tx_hash": "0x85e744df745a9587fe27379ef8fb663117a1cf48baa8758cd2cc151df547e539",
+      "contract": "0xaea2e6252093b25dbe151F613696162908bE987a",
+      "gas_price": 0
+    },
+    "total_duration_ms": 0,
+    "tool_calls": 4,
+    "retries": 0
   }
 ]
