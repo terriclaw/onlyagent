@@ -125,8 +125,8 @@ This allows protocols to accept decisions derived from private inference while s
 
 | Contract | Address |
 |---|---|
-| OnlyAgent | `0xBa9d89888F32Bce09D1Fc596FD25dc44ab7645C4` |
-| AgentReputation | `0xB45c1e0Dc6b5d07ecCEDb9F7953e38Bad8f4BB9F` |
+| OnlyAgent | `0x5158969E52dB9B919E995EBFeC468978435a3A57` |
+| AgentReputation | `0x1BF485396e831B7c640Ef0152e3df88926F911D6` |
 
 Deployed with `gasPrice: 0` — Status Network is gasless at the protocol level.
 
@@ -136,7 +136,7 @@ Deployed with `gasPrice: 0` — Status Network is gasless at the protocol level.
 
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
 - 🔗 [Demo TX](https://basescan.org/tx/0x0f47d6109c1ad3cff2ed6b17ceeda65348edf61598172052c0a1fec6e8b2140f) — TerriClaw (terriclaw.terricola.eth) calling prove() on Base Mainnet
-- ⛽ [Gasless TX](https://sepoliascan.status.network/tx/0xe97812a3c165059c9d751a7b953d9c1c481cd3fd2c88dc64c5acea4252b1f5ad) — prove() on Status Network Sepolia with gasPrice: 0
+- ⛽ [Gasless TX](https://sepoliascan.status.network/tx/0x860a5439d71544e8232eda8bfb2a1993987d3aefdb68ff472d8080238f42a7da) — prove() on Status Network Sepolia with gasPrice: 0
 
 ---
 
