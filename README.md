@@ -192,18 +192,28 @@ This allows autonomous agents to safely execute onchain actions without exposing
 
 ---
 
-## Venice TEE
+## Venice TEE Integration
 
-OnlyAgent is built for Venice AI's TEE response signing (Intel TDX). Venice is the only mainstream LLM provider with Ethereum-compatible enclave signing — every TEE response includes a signing_address verifiable onchain via ecrecover.
+OnlyAgent is built for Venice AI's TEE response signing (Intel TDX). Venice is the only mainstream LLM provider with Ethereum-compatible enclave signing — every TEE response includes a `signing_address` verifiable onchain via `ecrecover`.
 
-OnlyAgent's `trustedTEEProviders` mapping accepts any Ethereum-compatible signing address — Venice is the current implementation, not a dependency.
+**Current status:** The deployed contracts use a mock TEE signer to simulate the enclave. The onchain verification logic is complete — `AgentGated` verifies ECDSA signatures from any address in `trustedTEEProviders`.
 
-The current deployment uses a mock TEE signer. When Venice TEE ships:
+**What is already done:**
+- Contract verifies TEE signatures from any trusted provider address
+- Mock signer stands in for the enclave during development
+- `trustedTEEProviders` mapping is designed to accept the Venice enclave signing address
 
-1. Swap model to tee-qwen3-235b-a22b-thinking-2507 in scripts/agent.js
-2. Call addTEEProvider(veniceSigningAddress) on your contract
+**What remains:**
+- Venice TEE response signing ships → enclave produces a `signing_address` per response
+- Map the Venice response signature to the OnlyAgent commitment format
+- Call `addTEEProvider(veniceSigningAddress)` on the deployed contract
 
-Zero other changes needed.
+Zero contract changes needed. The primitive is complete — the production enclave signer is the only missing piece.
+
+When Venice TEE ships:
+
+1. Swap model to `tee-qwen3-235b-a22b-thinking-2507` in `scripts/agent.js`
+2. Call `addTEEProvider(veniceSigningAddress)` on your contract
 
 ---
 
