@@ -157,3 +157,48 @@ public     → open access
 ```
 
 Any contract that inherits `AgentGated` can gate functions to ERC-8004 registered agents that have provably executed a Venice AI reasoning pipeline before acting.
+
+---
+
+## Session 5 — Security Audit, Hardening, and Redeployment
+
+**Security audit:**
+ChatGPT performed a cold review of `AgentGated.sol` and identified four issues:
+
+1. **No chain binding** — the commitment hash did not include `block.chainid`, making proofs replayable across EVM-compatible chains
+2. **One-sided timestamp check** — only checked `block.timestamp <= timestamp + window`, not that `timestamp <= block.timestamp`, allowing future-dated proofs
+3. **Raw ecrecover** — used inline assembly for signature recovery instead of OpenZeppelin ECDSA, which handles signature malleability and zero-address edge cases
+4. **Redundant zero-address check** — `require(signer != address(0))` was unnecessary since OZ ECDSA already reverts on invalid signatures
+
+**Fixes applied to `AgentGated.sol`:**
+- Added `block.chainid` as the sixth field in the commitment hash: `keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp, block.chainid)`
+- Added `require(timestamp <= block.timestamp, "OnlyAgent: proof from future")`
+- Imported `@openzeppelin/contracts/utils/cryptography/ECDSA.sol`, switched to `ECDSA.recover()`
+- Removed redundant assembly `recoverSigner()` function and zero-address check
+
+**Redeployment to Base Mainnet:**
+- AgentReputation: `0x7e765A6c3581e008fF91c0c7240c474b11E912a0`
+- OnlyAgent: `0xa592d5605Cb5a03CF8cf1f80d7848e98939B6258`
+- First prove() on hardened contract: `0x0f47d6109c1ad3cff2ed6b17ceeda65348edf61598172052c0a1fec6e8b2140f`
+
+**Redeployment to Status Network Sepolia:**
+Session 4 contracts were pre-audit. Redeployed with hardened AgentGated:
+- OnlyAgent: `0x5158969E52dB9B919E995EBFeC468978435a3A57`
+- AgentReputation: `0x1BF485396e831B7c640Ef0152e3df88926F911D6`
+- MockERC8004: `0xD9d92232EBB9Fc748402800737222501245545A2`
+- Gasless prove() TX: `0x860a5439d71544e8232eda8bfb2a1993987d3aefdb68ff472d8080238f42a7da`
+
+**Scripts updated:**
+- `scripts/agent.js` — commitment hash updated to 6 fields including `chainId`
+- `scripts/prove-status.js` — commitment hash updated to match
+
+**README precision pass (ChatGPT review):**
+Three phrases corrected to avoid implying proof of reasoning quality:
+- "executed a reasoning pipeline" → "executed an attested inference pipeline"
+- "reasoning from this specific prompt" → "executing from this specific prompt"
+- "what reasoning produced the action" → "what model execution produced the action"
+
+The system proves execution provenance of an AI inference tied to a transaction — not reasoning correctness. The README now reflects this precisely.
+
+**Leaderboard updated:**
+Both chain addresses updated to post-audit deployments.
