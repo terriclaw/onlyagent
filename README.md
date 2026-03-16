@@ -27,7 +27,7 @@ The TEE signs a commitment hash:
 keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp, chainId)
 ```
 
-The contract verifies all six fields. This means the TEE is not just attesting *"an agent authorized this action"* — it is attesting *"this specific agent, executing from this specific prompt, produced this specific response, targeting this specific contract, at this specific time, on this specific chain."*
+The contract verifies all six fields. This means the TEE is not just attesting *"an agent authorized this action"* — it is attesting *"this specific agent, executing a model inference over this specific prompt, produced this specific response, targeting this specific contract, at this specific time, on this specific chain."*
 
 The contract does not read the prompt or response text — it sees hashes. But those hashes are binding. Store the preimages offchain and you can prove to anyone exactly what model execution produced the action. The chain commits to it.
 
@@ -68,9 +68,9 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 ## Use Cases
 
-**AI-gated governance** — A DAO requires agents to deliberate on proposals before submitting them. Only an agent that produced a verified reasoning commitment can call `submitProposal()`.
+**AI-gated governance** — A DAO requires agents to deliberate on proposals before submitting them. Only an agent that produced a verified execution commitment can call `submitProposal()`.
 
-**Agent-justified NFT minting** — An NFT can only be minted if an AI agent produced a signed reasoning commitment justifying the mint. No reasoning, no mint.
+**Agent-justified NFT minting** — An NFT can only be minted if an AI agent produced a signed execution commitment justifying the mint. No reasoning, no mint.
 
 **Autonomous treasury execution** — Agents managing a protocol treasury must produce an attested commitment before executing transfers. Every fund movement is traceable to a specific AI output.
 
