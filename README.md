@@ -8,7 +8,7 @@ A smart contract primitive for **verifiable AI agent execution onchain**.
 
 ## The Primitive
 
-Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an autonomous AI agent that executed a reasoning pipeline before acting.
+Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an autonomous AI agent that executed an attested inference pipeline before acting.
 
 `onlyAgent` is a Solidity modifier that changes this. Before a function executes, it verifies:
 
@@ -24,12 +24,12 @@ No proof, no access.
 
 The TEE signs a commitment hash:
 ```
-keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp)
+keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp, chainId)
 ```
 
-The contract verifies all five fields. This means the TEE is not just attesting *"an agent authorized this action"* — it is attesting *"this specific agent, reasoning from this specific prompt, produced this specific response, targeting this specific contract, at this specific time."*
+The contract verifies all six fields. This means the TEE is not just attesting *"an agent authorized this action"* — it is attesting *"this specific agent, executing from this specific prompt, produced this specific response, targeting this specific contract, at this specific time, on this specific chain."*
 
-The contract does not read the prompt or response text — it sees hashes. But those hashes are binding. Store the preimages offchain and you can prove to anyone exactly what reasoning produced the action. The chain commits to it.
+The contract does not read the prompt or response text — it sees hashes. But those hashes are binding. Store the preimages offchain and you can prove to anyone exactly what model execution produced the action. The chain commits to it.
 
 ---
 
@@ -37,7 +37,7 @@ The contract does not read the prompt or response text — it sees hashes. But t
 ```
 Venice AI (Intel TDX enclave)
 ↓
-signs keccak256(promptHash + responseHash + agentAddress + contractAddress + timestamp)
+signs keccak256(promptHash + responseHash + agentAddress + contractAddress + timestamp + chainId)
 ↓
 ERC-8004 registered agent identity
 ↓
@@ -102,7 +102,7 @@ A Venice TEE model can analyze private information — financial data, governanc
 The enclave signs a commitment binding the prompt and response to a specific onchain action:
 
 ```
-keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp)
+keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp, chainId)
 ```
 
 The contract verifies this commitment before executing the action.
@@ -115,8 +115,8 @@ This allows protocols to accept decisions derived from private inference while s
 
 | Contract | Address |
 |---|---|
-| OnlyAgent (demo) | `0x5158969E52dB9B919E995EBFeC468978435a3A57` |
-| AgentReputation | `0x1BF485396e831B7c640Ef0152e3df88926F911D6` |
+| OnlyAgent (demo) | `0xa592d5605Cb5a03CF8cf1f80d7848e98939B6258` |
+| AgentReputation | `0x7e765A6c3581e008fF91c0c7240c474b11E912a0` |
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
 
 ---
@@ -135,7 +135,7 @@ Deployed with `gasPrice: 0` — Status Network is gasless at the protocol level.
 ## Live Demo
 
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
-- 🔗 [Demo TX](https://basescan.org/tx/0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2) — TerriClaw (terriclaw.terricola.eth) calling prove() on Base Mainnet
+- 🔗 [Demo TX](https://basescan.org/tx/0x0f47d6109c1ad3cff2ed6b17ceeda65348edf61598172052c0a1fec6e8b2140f) — TerriClaw (terriclaw.terricola.eth) calling prove() on Base Mainnet
 - ⛽ [Gasless TX](https://sepoliascan.status.network/tx/0xe97812a3c165059c9d751a7b953d9c1c481cd3fd2c88dc64c5acea4252b1f5ad) — prove() on Status Network Sepolia with gasPrice: 0
 
 ---

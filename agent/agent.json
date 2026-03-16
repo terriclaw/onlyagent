@@ -29,8 +29,8 @@
     "max_tokens": 20000,
     "proof_validity_window_seconds": 120
   },
-  "onlyagent_contract": "0x5158969E52dB9B919E995EBFeC468978435a3A57",
-  "reputation_contract": "0x1BF485396e831B7c640Ef0152e3df88926F911D6",
+  "onlyagent_contract": "0xa592d5605Cb5a03CF8cf1f80d7848e98939B6258",
+  "reputation_contract": "0x7e765A6c3581e008fF91c0c7240c474b11E912a0",
   "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
   "erc8004_registration_reference": "https://basescan.org/address/0x0457B3DED2BA9E56520B21735f4324F6533F93ff"
 }

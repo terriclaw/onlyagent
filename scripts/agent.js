@@ -89,9 +89,11 @@ async function main() {
 
   // 3. Build commitment
   console.log("\n[3/5] Building commitment hash...");
+  const network = await (new ethers.JsonRpcProvider(process.env.BASE_RPC_URL)).getNetwork();
+  const chainId = network.chainId;
   const commitment = ethers.solidityPackedKeccak256(
-    ["bytes32", "bytes32", "address", "address", "uint256"],
-    [promptHash, responseHash, agentAddress, process.env.ONLY_AGENT_ADDRESS, timestamp]
+    ["bytes32", "bytes32", "address", "address", "uint256", "uint256"],
+    [promptHash, responseHash, agentAddress, process.env.ONLY_AGENT_ADDRESS, timestamp, chainId]
   );
   console.log("Commitment:", commitment);
 

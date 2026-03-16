@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+
 interface IERC8004 {
     function balanceOf(address owner) external view returns (uint256);
 }
@@ -20,6 +22,7 @@ interface IAgentReputation {
 // onlyKeeper → automated keeper network
 // onlyAgent  → verified AI execution provenance
 abstract contract AgentGated {
+    using ECDSA for bytes32;
     address public owner;
     IERC8004 public immutable erc8004Registry;
     IAgentReputation public immutable reputation;
@@ -73,6 +76,7 @@ abstract contract AgentGated {
             "OnlyAgent: not a registered agent"
         );
 
+        require(timestamp <= block.timestamp, "OnlyAgent: proof from future");
         require(
             block.timestamp <= timestamp + proofValidityWindow,
             "OnlyAgent: proof expired"
@@ -84,19 +88,16 @@ abstract contract AgentGated {
                 responseHash,
                 msg.sender,
                 address(this),
-                timestamp
+                timestamp,
+                block.chainid
             )
         );
 
         require(!usedNonces[commitment], "OnlyAgent: proof already used");
         usedNonces[commitment] = true;
 
-        bytes32 ethSignedHash = keccak256(
-            abi.encodePacked("\x19Ethereum Signed Message:\n32", commitment)
-        );
-
-        address signer = recoverSigner(ethSignedHash, teeSignature);
-        require(signer != address(0), "OnlyAgent: invalid signature");
+        bytes32 ethSignedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", commitment));
+        address signer = ECDSA.recover(ethSignedHash, teeSignature);
         require(trustedTEEProviders[signer], "OnlyAgent: untrusted TEE provider");
 
         reputation.recordAction(msg.sender, address(this));
@@ -106,16 +107,5 @@ abstract contract AgentGated {
         _;
     }
 
-    function recoverSigner(bytes32 hash, bytes memory sig) internal pure returns (address) {
-        require(sig.length == 65, "Invalid signature length");
-        bytes32 r;
-        bytes32 s;
-        uint8 v;
-        assembly {
-            r := mload(add(sig, 32))
-            s := mload(add(sig, 64))
-            v := byte(0, mload(add(sig, 96)))
-        }
-        return ecrecover(hash, v, r, s);
-    }
+
 }

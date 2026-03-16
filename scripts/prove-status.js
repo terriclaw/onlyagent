@@ -59,8 +59,8 @@ async function main() {
 
   console.log("\n[3/5] Building commitment...");
   const commitment = ethers.solidityPackedKeccak256(
-    ["bytes32", "bytes32", "address", "address", "uint256"],
-    [promptHash, responseHash, agentWallet.address, process.env.STATUS_ONLY_AGENT_ADDRESS, timestamp]
+    ["bytes32", "bytes32", "address", "address", "uint256", "uint256"],
+    [promptHash, responseHash, agentWallet.address, process.env.STATUS_ONLY_AGENT_ADDRESS, timestamp, network.chainId]
   );
   console.log("Commitment:", commitment);
 
