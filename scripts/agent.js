@@ -59,7 +59,7 @@ async function main() {
     process.exit(1);
   }
 
-  const prompt = process.argv[2] || "Should I execute this onchain transaction? Reason carefully.";
+  const prompt = process.argv[2] || "Should I execute this onchain transaction? Assess the request and decide.";
 
   console.log("═══════════════════════════════════════");
   console.log("  OnlyAgent — Proving AI Reasoning");

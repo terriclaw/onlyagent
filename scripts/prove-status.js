@@ -42,7 +42,7 @@ async function main() {
   console.log("Agent wallet:", agentWallet.address);
   console.log("Contract:    ", process.env.STATUS_ONLY_AGENT_ADDRESS);
 
-  const prompt = "OnlyAgent: Should I execute a gasless prove() on Status Network Sepolia? Reason carefully about the significance of gasless AI agent execution onchain.";
+  const prompt = "OnlyAgent: Should I execute a gasless prove() on Status Network Sepolia? Assess the request and its onchain significance.";
 
   console.log("\n[1/5] Calling Venice...");
   const { response, reasoning } = await callVenice(prompt);

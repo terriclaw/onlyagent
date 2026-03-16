@@ -1,83 +1,146 @@
-{
-  "task": "Prove AI execution provenance onchain via OnlyAgent",
-  "agent": "TerriClaw",
-  "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
-  "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
-  "run": 3,
-  "status": "success",
-  "steps": [
-    {
-      "step": 1,
-      "action": "discover",
-      "description": "Received task: prove reasoning before executing onchain transaction",
-      "tool": "openclaw_skill",
-      "result": "task_accepted"
-    },
-    {
-      "step": 2,
-      "action": "plan",
-      "description": "Decided to call Venice AI with reasoning prompt, then submit TEE commitment to OnlyAgent contract",
-      "tool": "internal",
-      "result": "plan_ready"
-    },
-    {
-      "step": 3,
-      "action": "execute",
-      "description": "Called Venice AI model qwen3-235b-a22b-thinking-2507",
-      "tool": "venice_api",
-      "model": "qwen3-235b-a22b-thinking-2507",
-      "prompt": "What's the most interesting problem to solve in crypto right now?",
-      "prompt_hash": "0xb5fb43b8b2a13e2f6ea2db04cf0098dcc346f67418e33567e417e7b5ae6c4a37",
-      "response_hash": "0x2f038043fcc0a3d154a1571ab069a5a389d0b8f6883cdf74b2e6e32eb44211b0",
-      "latency_ms": 2000,
-      "result": "response_received"
-    },
-    {
-      "step": 4,
-      "action": "execute",
-      "description": "Built commitment hash and obtained TEE signature",
-      "tool": "ethers",
-      "commitment": "0xb88f900efdf4242947e1d76ea8f537f4eb700182e1bd52b2fbf38deea6f1ea8a",
-      "tee_signer": "0xa741Aff206168974362c911de580678fc4880542",
-      "timestamp": 1773528646,
-      "result": "commitment_signed"
-    },
-    {
-      "step": 5,
-      "action": "verify",
-      "description": "Validated transaction parameters before submission: contract address, calldata, chainId",
-      "tool": "internal",
-      "contract": "0x5158969E52dB9B919E995EBFeC468978435a3A57",
-      "chain_id": 8453,
-      "result": "parameters_valid"
-    },
-    {
-      "step": 6,
-      "action": "submit",
-      "description": "Submitted transaction via Bankr wallet on Base Mainnet",
-      "tool": "bankr_wallet",
-      "job_id": "job_2S2YR6PJMHX5FLNH",
-      "result": "tx_submitted",
-      "duration_ms": 17700
-    },
-    {
-      "step": 7,
-      "action": "verify",
-      "description": "Confirmed transaction success and reputation increment on AgentReputation contract",
-      "tool": "base_rpc",
+[
+  {
+    "task": "Prove AI execution provenance onchain via OnlyAgent",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+    "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "run": 3,
+    "status": "success",
+    "steps": [
+      {
+        "step": 1,
+        "action": "discover",
+        "description": "Received task: prove AI execution provenance before executing onchain transaction",
+        "tool": "openclaw_skill",
+        "result": "task_accepted"
+      },
+      {
+        "step": 2,
+        "action": "plan",
+        "description": "Decided to call Venice AI for attested inference, then submit TEE commitment to OnlyAgent contract",
+        "tool": "internal",
+        "result": "plan_ready"
+      },
+      {
+        "step": 3,
+        "action": "execute",
+        "description": "Called Venice AI model qwen3-235b-a22b-thinking-2507",
+        "tool": "venice_api",
+        "model": "qwen3-235b-a22b-thinking-2507",
+        "prompt": "What's the most interesting problem to solve in crypto right now?",
+        "prompt_hash": "0xb5fb43b8b2a13e2f6ea2db04cf0098dcc346f67418e33567e417e7b5ae6c4a37",
+        "response_hash": "0x2f038043fcc0a3d154a1571ab069a5a389d0b8f6883cdf74b2e6e32eb44211b0",
+        "latency_ms": 2000,
+        "result": "response_received"
+      },
+      {
+        "step": 4,
+        "action": "execute",
+        "description": "Built commitment hash and obtained TEE signature",
+        "tool": "ethers",
+        "commitment": "0xb88f900efdf4242947e1d76ea8f537f4eb700182e1bd52b2fbf38deea6f1ea8a",
+        "tee_signer": "0xa741Aff206168974362c911de580678fc4880542",
+        "timestamp": 1773528646,
+        "result": "commitment_signed"
+      },
+      {
+        "step": 5,
+        "action": "verify",
+        "description": "Validated transaction parameters before submission: contract address, calldata, chainId",
+        "tool": "internal",
+        "contract": "0x5158969E52dB9B919E995EBFeC468978435a3A57",
+        "chain_id": 8453,
+        "result": "parameters_valid"
+      },
+      {
+        "step": 6,
+        "action": "submit",
+        "description": "Submitted transaction via Bankr wallet on Base Mainnet",
+        "tool": "bankr_wallet",
+        "job_id": "job_2S2YR6PJMHX5FLNH",
+        "result": "tx_submitted",
+        "duration_ms": 17700
+      },
+      {
+        "step": 7,
+        "action": "verify",
+        "description": "Confirmed transaction success and reputation increment on AgentReputation contract",
+        "tool": "base_rpc",
+        "tx_hash": "0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2",
+        "basescan": "https://basescan.org/tx/0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2",
+        "result": "confirmed"
+      }
+    ],
+    "final_output": {
       "tx_hash": "0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2",
-      "basescan": "https://basescan.org/tx/0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2",
-      "result": "confirmed"
-    }
-  ],
-  "final_output": {
-    "tx_hash": "0x682010d81d9ed7ecb37233e99fe59c716836311699e46a54d0770d4a782a0bd2",
-    "reputation_score": 1,
-    "total_actions": 1,
-    "unique_contracts": 1
+      "reputation_score": 1,
+      "total_actions": 1,
+      "unique_contracts": 1
+    },
+    "total_duration_ms": 17700,
+    "tool_calls": 5,
+    "retries": 2,
+    "retry_reason": "ERC-8004 isRegistered interface mismatch on first two runs \u2014 fixed by switching to balanceOf check"
   },
-  "total_duration_ms": 17700,
-  "tool_calls": 5,
-  "retries": 2,
-  "retry_reason": "ERC-8004 isRegistered interface mismatch on first two runs — fixed by switching to balanceOf check"
-}
+  {
+    "task": "Prove AI execution provenance on hardened OnlyAgent contract",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+    "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "run": 4,
+    "status": "success",
+    "context": "First prove() on hardened AgentGated \u2014 chainId binding, OZ ECDSA, two-sided timestamp",
+    "steps": [
+      {
+        "step": 1,
+        "action": "execute",
+        "description": "Called Venice AI with hardening confirmation prompt",
+        "tool": "venice_api",
+        "model": "qwen3-235b-a22b-thinking-2507",
+        "prompt": "OnlyAgent has been hardened with chain binding and OpenZeppelin ECDSA. Should I execute the first prove() on the new contract? Reason carefully.",
+        "prompt_hash": "0x61fd208a2a0293fabf2faae8fe4ad7c70c406f944d573ba7c9582e3fd3f287a1",
+        "response_hash": "0x843c1161e046ad5846b429bf00a3b983bfe67cd561629ed4fb047eaf38474a1d",
+        "latency_ms": 2000,
+        "result": "response_received"
+      },
+      {
+        "step": 2,
+        "action": "execute",
+        "description": "Built 6-field commitment hash including chainId and obtained TEE signature",
+        "tool": "ethers",
+        "commitment": "0x0b115059a586543dc8ab8baa52802901f7079adadbc71779f005ee1f306cfa32",
+        "tee_signer": "0xa741Aff206168974362c911de580678fc4880542",
+        "timestamp": 1773686332,
+        "chain_id": 8453,
+        "result": "commitment_signed"
+      },
+      {
+        "step": 3,
+        "action": "submit",
+        "description": "Submitted transaction via Bankr wallet on Base Mainnet",
+        "tool": "bankr_wallet",
+        "job_id": "job_8QKPS63LM8ALFCRT",
+        "thread_id": "thr_85VEM4ZPW82S456V",
+        "contract": "0xa592d5605Cb5a03CF8cf1f80d7848e98939B6258",
+        "result": "tx_submitted",
+        "duration_ms": 21600
+      },
+      {
+        "step": 4,
+        "action": "verify",
+        "description": "Confirmed transaction on hardened contract",
+        "tool": "base_rpc",
+        "tx_hash": "0x0f47d6109c1ad3cff2ed6b17ceeda65348edf61598172052c0a1fec6e8b2140f",
+        "basescan": "https://basescan.org/tx/0x0f47d6109c1ad3cff2ed6b17ceeda65348edf61598172052c0a1fec6e8b2140f",
+        "result": "confirmed"
+      }
+    ],
+    "final_output": {
+      "tx_hash": "0x0f47d6109c1ad3cff2ed6b17ceeda65348edf61598172052c0a1fec6e8b2140f",
+      "contract": "0xa592d5605Cb5a03CF8cf1f80d7848e98939B6258"
+    },
+    "total_duration_ms": 21600,
+    "tool_calls": 4,
+    "retries": 0
+  }
+]

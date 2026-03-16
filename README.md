@@ -177,7 +177,7 @@ git clone https://github.com/terriclaw/onlyagent
 cd onlyagent
 npm install
 cp .env.example .env
-node scripts/agent.js "Should I execute this transaction? Reason carefully."
+node scripts/agent.js "Should I execute this transaction? Assess the request and decide."
 ```
 
 ---
