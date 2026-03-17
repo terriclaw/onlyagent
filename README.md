@@ -2,7 +2,7 @@
 
 A smart contract primitive for **verifiable AI agent execution onchain**.
 
-`onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider — currently implemented with Venice AI's Intel TDX TEE signing.
+`onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider that exposes Ethereum-verifiable ECDSA signatures. The current demo uses a mock TEE signer modeled on Venice AI's documented TEE signing flow.
 
 ---
 
@@ -35,9 +35,9 @@ The contract does not read the prompt or response text — it sees hashes. But t
 
 ## The Trust Chain
 ```
-Venice AI (Intel TDX enclave)
+Trusted TEE provider (mock signer in current deployment; Venice TEE target integration)
 ↓
-signs keccak256(promptHash + responseHash + agentAddress + contractAddress + timestamp + chainId)
+signs an Ethereum-verifiable payload that is mapped into the OnlyAgent execution commitment
 ↓
 ERC-8004 registered agent identity
 ↓
@@ -204,11 +204,14 @@ OnlyAgent is built for Venice AI's TEE response signing (Intel TDX). Venice is t
 - `trustedTEEProviders` mapping is designed to accept the Venice enclave signing address
 
 **What remains:**
-- Venice TEE response signing ships → enclave produces a `signing_address` per response
-- Map the Venice response signature to the OnlyAgent commitment format
-- Call `addTEEProvider(veniceSigningAddress)` on the deployed contract
+- Venice TEE attestation and response-signing endpoints are expected to provide an Ethereum-verifiable signing identity
+- The exact signed payload format is not yet finalized in this integration
+- Once the live payload is available, `scripts/agent.js` will adapt that payload into the OnlyAgent execution commitment flow
+- If Venice signs the full execution context, integration is direct
+- If Venice signs a Venice-defined response payload, the offchain adapter will map that payload into the commitment verification pipeline
+- Add the Venice `signing_address` to `trustedTEEProviders`
 
-Zero contract changes needed. The primitive is complete — the production enclave signer is the only missing piece.
+The onchain primitive is complete. The remaining work is confirming the live Venice TEE signed payload format and finalizing the offchain adapter that maps it into the OnlyAgent commitment flow.
 
 When Venice TEE ships:
 
