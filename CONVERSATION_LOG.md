@@ -234,3 +234,56 @@ Both chain addresses updated to post-audit deployments.
 **Additional cleanup:**
 - `agent.js` header banner updated: "Proving AI Reasoning" → "Proving AI Execution"
 - `agent.js` footer updated: "genuinely reasoned before acting" → "executed an attested inference before acting"
+
+## Session 7 — Live Venice TEE Signature Verified Directly Onchain
+
+**Major transition:**
+The mock TEE signer was fully removed from the Base Mainnet path. OnlyAgent now verifies Venice's live per-request TEE signature directly onchain.
+
+**What changed:**
+- Venice `e2ee-*` models were confirmed live with `x-venice-tee: true`
+- `GET /api/v1/tee/attestation?model=e2ee-qwen-2-5-7b-p` returned a live enclave signer:
+  - `0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c`
+- `GET /api/v1/tee/signature?model=e2ee-qwen-2-5-7b-p&request_id=<id>` returned:
+  - `text = promptHash:responseHash`
+  - `signature`
+  - matching `signing_address`
+- Local verification with `ethers.verifyMessage(text, signature)` recovered the attested signer exactly
+
+**Contract architecture update:**
+`AgentGated.sol` was rewritten to verify Venice's real payload format directly:
+- reconstruct lowercase no-prefix `promptHash:responseHash`
+- compute Ethereum signed-message hash over the raw text
+- recover signer directly from Venice signature
+- require signer is in `trustedTEEProviders`
+
+This removed the old mock/offchain adapter signer from the Base execution path.
+
+**Deployment:**
+New Base Mainnet contracts were deployed:
+- AgentReputation: `0xB5e35148d21C630faafB10eBF20AE455635B3aE1`
+- OnlyAgent: `0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D`
+
+`AgentReputation.addAgentGatedContract(OnlyAgent)` was linked manually after deployment due to a replacement-underpriced nonce error in the deploy script.
+
+**Live proof run:**
+TerriClaw executed the updated pipeline:
+1. Call live Venice e2ee model
+2. Fetch attestation
+3. Fetch per-request signature
+4. Verify signer locally
+5. Submit `prove()` via Bankr
+6. Contract verifies Venice signature directly onchain
+
+**Live Base TX:**
+`0xc356c1dba0cb5945ae4fcca77b3d56da2896bc7c952cb66e9ce840942912779a`
+
+This is the first full end-to-end OnlyAgent proof using:
+- live Venice TEE execution
+- live Venice attestation
+- live Venice per-request signing
+- direct onchain signature verification
+- real ERC-8004 agent identity
+- real Bankr agent execution
+
+At this point, OnlyAgent is no longer a mock TEE demo on Base Mainnet. The Venice-backed execution gate is live.

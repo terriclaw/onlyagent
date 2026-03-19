@@ -253,5 +253,80 @@
     "total_duration_ms": 0,
     "tool_calls": 4,
     "retries": 0
+  },
+  {
+    "task": "Prove live Venice TEE execution provenance directly onchain via OnlyAgent",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+    "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "run": 7,
+    "status": "success",
+    "context": "First end-to-end proof using live Venice e2ee model attestation and per-request signature, with no mock signer or adapter signer",
+    "steps": [
+      {
+        "step": 1,
+        "action": "execute",
+        "description": "Called live Venice e2ee TEE model and received completion",
+        "tool": "venice_api",
+        "model": "e2ee-qwen-2-5-7b-p",
+        "prompt": "Should I execute this onchain transaction? Assess the request and decide.",
+        "request_id": "chatcmpl-0a327977ee7a45d198a1ada36316627f",
+        "tee_confirmed": true,
+        "tee_provider": "phala",
+        "result": "response_received"
+      },
+      {
+        "step": 2,
+        "action": "verify",
+        "description": "Fetched Venice TEE attestation and confirmed live signer identity",
+        "tool": "venice_attestation",
+        "signing_address": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+        "tee_hardware": "intel-tdx",
+        "verified": true,
+        "result": "attestation_verified"
+      },
+      {
+        "step": 3,
+        "action": "verify",
+        "description": "Fetched per-request Venice signature and recovered signer from personal_sign(promptHash:responseHash)",
+        "tool": "venice_signature",
+        "signed_text": "491b44e555a8621a188e68a2db371c8971cf8f938e40562d675d330f884a5cb3:fbe134a8bdfee56f87abf48e68a891d6ad6b1227e012bb32ca4e0178d363e63d",
+        "prompt_hash": "0x491b44e555a8621a188e68a2db371c8971cf8f938e40562d675d330f884a5cb3",
+        "response_hash": "0xfbe134a8bdfee56f87abf48e68a891d6ad6b1227e012bb32ca4e0178d363e63d",
+        "signature": "venice_request_signature",
+        "recovered_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+        "result": "signature_verified"
+      },
+      {
+        "step": 4,
+        "action": "submit",
+        "description": "Submitted prove() via Bankr using TerriClaw wallet against Venice-native verification contract",
+        "tool": "bankr_wallet",
+        "job_id": "job_DYECLFPU6JJES2E4",
+        "thread_id": "thr_PGPMNBSM6PG52RLA",
+        "contract": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+        "timestamp": 1773898889,
+        "result": "tx_submitted",
+        "duration_ms": 17600
+      },
+      {
+        "step": 5,
+        "action": "verify",
+        "description": "Confirmed live Venice TEE signature was accepted directly onchain by onlyAgent",
+        "tool": "base_rpc",
+        "tx_hash": "0xc356c1dba0cb5945ae4fcca77b3d56da2896bc7c952cb66e9ce840942912779a",
+        "basescan": "https://basescan.org/tx/0xc356c1dba0cb5945ae4fcca77b3d56da2896bc7c952cb66e9ce840942912779a",
+        "result": "confirmed"
+      }
+    ],
+    "final_output": {
+      "tx_hash": "0xc356c1dba0cb5945ae4fcca77b3d56da2896bc7c952cb66e9ce840942912779a",
+      "contract": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+      "reputation_contract": "0xB5e35148d21C630faafB10eBF20AE455635B3aE1",
+      "venice_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c"
+    },
+    "total_duration_ms": 17600,
+    "tool_calls": 5,
+    "retries": 0
   }
 ]

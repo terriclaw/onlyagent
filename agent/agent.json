@@ -14,13 +14,14 @@
     "onchain_verification",
     "agent_reputation",
     "tee_commitment",
-    "contract_execution"
+    "contract_execution",
+    "tee_signature_verification"
   ],
   "tech_stack": [
     "Node.js",
     "Solidity",
     "Base Mainnet",
-    "Venice AI (Intel TDX TEE)",
+    "Venice AI (Phala / Intel TDX TEE)",
     "ERC-8004",
     "EIP-7702",
     "Status Network Sepolia"
@@ -33,9 +34,10 @@
   "erc8004_registration_reference": "https://basescan.org/address/0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
   "contracts": {
     "base_mainnet": {
-      "onlyagent": "0x2367Ea8321bC461AAa3C156D92C4cAd73f89F4c5",
-      "reputation": "0x92d48F5375a86484706549C9fD71Ac3C62E98eb9",
-      "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
+      "onlyagent": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+      "reputation": "0xB5e35148d21C630faafB10eBF20AE455635B3aE1",
+      "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+      "venice_tee_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c"
     },
     "status_sepolia": {
       "onlyagent": "0xaea2e6252093b25dbe151F613696162908bE987a",
