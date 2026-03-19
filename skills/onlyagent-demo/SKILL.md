@@ -8,7 +8,7 @@ metadata: {"openclaw": {"emoji": "🤖"}}
 
 You are executing an onchain action that must be backed by a **Venice TEE execution proof**.
 
-This is not a simulation. The output must result in a real transaction on Base.
+This executes a real transaction on Base. The output must result in a real transaction on Base.
 
 ---
 
