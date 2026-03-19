@@ -2,7 +2,7 @@
 
 A smart contract primitive for **verifiable AI agent execution onchain**.
 
-`onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider that exposes Ethereum-verifiable ECDSA signatures. The current Base Mainnet demo verifies Venice AI's live TEE signer directly onchain.
+`onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider that exposes Ethereum-verifiable ECDSA signatures. The current Base Mainnet demo verifies signatures from Venice AI's live TEE signer directly onchain.
 
 ---
 
@@ -75,7 +75,7 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 **AI-gated governance** — A DAO requires agents to deliberate on proposals before submitting them. Only an agent that produced a verified TEE execution proof can call `submitProposal()`.
 
-**Agent-justified NFT minting** — An NFT can only be minted if an AI agent produced a verified TEE execution proof justifying the mint. No reasoning, no mint.
+**Agent-justified NFT minting** — An NFT can only be minted if an AI agent produced a verified TEE execution proof justifying the mint. No verified execution proof, no mint.
 
 **Autonomous treasury execution** — Agents managing a protocol treasury must produce an attested execution proof before executing transfers. Every fund movement is traceable to a specific AI output.
 
@@ -119,9 +119,6 @@ This allows protocols to accept decisions derived from private inference while s
 | OnlyAgent (demo) | `0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D` |
 | AgentReputation | `0xB5e35148d21C630faafB10eBF20AE455635B3aE1` |
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
-
----
-
 
 ---
 
