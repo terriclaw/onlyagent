@@ -1,28 +1,60 @@
 ---
 name: onlyagent-demo
-description: Run the OnlyAgent demo and prove attested AI execution onchain. The agent performs a model inference, produces a Venice TEE-signed (promptHash:responseHash) which is bound into an onchain execution commitment, and submits a prove() transaction to the OnlyAgent contract.
+description: Use to prove Venice TEE execution onchain via OnlyAgent. The agent performs private inference, verifies the Venice TEE signature, and executes a gated transaction on Base.
 metadata: {"openclaw": {"emoji": "🤖"}}
 ---
 
-# OnlyAgent Demo
+# ONLYAGENT — Verifiable AI execution onchain
 
-## Base Mainnet (default)
+You are executing an onchain action that must be backed by a **Venice TEE execution proof**.
 
-Before running, ask the user for their Bankr EVM address if AGENT_ADDRESS is not set.
+This is not a simulation. The output must result in a real transaction on Base.
 
-Note: Venice signs promptHash:responseHash. The agent verifies this signature and constructs the onchain commitment.
-Run the full proof flow:
-```bash
-cd ~/onlyagent && AGENT_ADDRESS=<your-bankr-evm-address> node scripts/agent.js "<prompt>"
-```
+---
 
-Save output as a log:
-```bash
-cd ~/onlyagent && mkdir -p logs && AGENT_ADDRESS=<your-bankr-evm-address> node scripts/agent.js "<prompt>" 2>&1 | tee logs/proof-$(date +%s).log
-```
+## What this does
 
-After running, report:
-- Venice model output summary (2-3 sentences)
-- Derived execution commitment (keccak256 binding prompt, response, agent, contract, timestamp, chainId)
-- Transaction hash with Basescan link
-- Block number confirmed in
+- Calls a Venice `e2ee-*` model (TEE-backed, no data retention)
+- Fetches attestation and per-request signature
+- Verifies `personal_sign(promptHash:responseHash)`
+- Submits a transaction to OnlyAgent on Base
+- Only succeeds if the Venice TEE signer is trusted onchain
+
+---
+
+## Run the demo
+
+If AGENT_ADDRESS is not set, ask the user for their Bankr EVM address.
+
+Execute:
+
+cd ~/onlyagent && AGENT_ADDRESS=<bankr-address> node scripts/agent.js "<prompt>"
+
+---
+
+## Expected result
+
+You must report:
+
+- Venice model used (e.g. `e2ee-qwen-2-5-7b-p`)
+- TEE verification status and signer address
+- Prompt hash and response hash
+- Transaction hash (BaseScan link)
+
+---
+
+## Important constraints
+
+- Venice signs `promptHash:responseHash` using `personal_sign`
+- The contract verifies this signature directly onchain
+- No valid TEE signature → transaction fails
+- This is enforced by the `onlyAgent` modifier
+
+---
+
+## Mental model
+
+Venice provides **private cognition**.
+
+OnlyAgent enforces that cognition as a **condition for onchain execution**.
+
