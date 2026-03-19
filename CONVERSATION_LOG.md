@@ -358,3 +358,31 @@ This confirms that OnlyAgent is verifying unique execution instances, not just p
 **Third live Base TX:**
 `0x658c0f6aef71cfef606f72079809acdd408d3cd47b6026172ac77c3441c53567`
 
+
+## Session 8 — Terminology Correction: Execution vs Reasoning
+
+**Key realization:**
+Earlier iterations of OnlyAgent described the system as proving "AI reasoning." This was incorrect.
+
+The system does not verify:
+- reasoning quality
+- correctness of outputs
+- internal chain-of-thought
+
+It verifies:
+- that a specific execution occurred (`promptHash:responseHash`)
+- that the execution was signed by a trusted TEE provider
+- that the caller is a registered agent
+- that the proof is fresh
+
+**Correction applied:**
+- Replaced "execution commitment" → "TEE execution proof"
+- Removed "reasoning" and "justification" language from README
+- Clarified that Venice signs execution artifacts, not decisions
+- Clarified that the contract verifies signatures, not attestation itself
+
+**Resulting model:**
+OnlyAgent enforces execution provenance, not reasoning validity.
+
+This aligns the documentation with actual contract behavior and removes overclaims.
+
