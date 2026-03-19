@@ -13,7 +13,7 @@ Any wallet can call any smart contract. There is no way to distinguish a human p
 `onlyAgent` is a Solidity modifier that changes this. Before a function executes, it verifies:
 
 1. **ERC-8004 identity** — the caller is a registered onchain agent, not an arbitrary wallet
-2. **Execution commitment** — a TEE-signed hash binding this specific prompt and response to this specific agent, contract, and timestamp
+2. **TEE execution proof** — a TEE-signed payload proving a specific prompt and response were executed by a trusted model
 3. **Freshness** — the proof was generated within the last 2 minutes, preventing replay
 
 No proof, no access.
@@ -24,22 +24,25 @@ No proof, no access.
 
 Venice's enclave signs `personal_sign(promptHash:responseHash)` — proving a specific model execution occurred.
 
-The offchain adapter verifies that signature against the attested signing address, extracts the confirmed hashes, then constructs the action-bound commitment:
-```
-keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp, chainId)
-```
+The contract reconstructs `promptHash:responseHash`, verifies the signature using standard Ethereum `personal_sign` semantics, and checks that the recovered signer matches a trusted TEE provider.
 
-The contract verifies this commitment. Venice proves *what model ran*. The commitment proves *that execution was bound to this specific agent, contract, and moment in time*.
+The execution is bound to context by onchain checks:
+- `msg.sender` must be an ERC-8004 registered agent
+- `timestamp` must be within the freshness window
+
+Venice proves *what model ran*. The contract enforces *who is acting and when*.
 
 The contract does not read the prompt or response text — it sees hashes. Store the preimages offchain and you can prove exactly what model execution produced the action.
 
 ---
 
+
+
 ## The Trust Chain
 ```
 Trusted TEE provider (live Venice TEE signer in current Base deployment)
 ↓
-signs an Ethereum-verifiable payload that is mapped into the OnlyAgent execution commitment
+signs an Ethereum-verifiable execution proof that OnlyAgent verifies directly onchain
 ↓
 ERC-8004 registered agent identity
 ↓
@@ -70,13 +73,13 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 ## Use Cases
 
-**AI-gated governance** — A DAO requires agents to deliberate on proposals before submitting them. Only an agent that produced a verified execution commitment can call `submitProposal()`.
+**AI-gated governance** — A DAO requires agents to deliberate on proposals before submitting them. Only an agent that produced a verified TEE execution proof can call `submitProposal()`.
 
-**Agent-justified NFT minting** — An NFT can only be minted if an AI agent produced a signed execution commitment justifying the mint. No reasoning, no mint.
+**Agent-justified NFT minting** — An NFT can only be minted if an AI agent produced a verified TEE execution proof justifying the mint. No reasoning, no mint.
 
-**Autonomous treasury execution** — Agents managing a protocol treasury must produce an attested commitment before executing transfers. Every fund movement is traceable to a specific AI output.
+**Autonomous treasury execution** — Agents managing a protocol treasury must produce an attested execution proof before executing transfers. Every fund movement is traceable to a specific AI output.
 
-**Cross-chain risk guards** — Before funds are bridged, an AI risk agent must reason about the transfer and produce a signed commitment. The bridge contract verifies it before releasing funds.
+**Cross-chain risk guards** — Before funds are bridged, an AI risk agent must reason about the transfer and produce a verified TEE execution proof. The bridge contract verifies it before releasing funds.
 
 ---
 
@@ -103,12 +106,7 @@ A Venice TEE model can analyze private information — financial data, governanc
 
 The enclave signs `personal_sign(promptHash:responseHash)` for the model execution itself.
 
-The offchain adapter then binds those verified hashes to a specific onchain action by constructing:
-```
-keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp, chainId)
-```
-
-The contract verifies this action-bound commitment before executing the call.
+The contract verifies the Venice TEE signature directly onchain and enforces that the execution is fresh and initiated by a registered agent.
 
 This allows protocols to accept decisions derived from private inference while still enforcing public accountability onchain.
 
@@ -221,21 +219,6 @@ Venice signs `promptHash:responseHash` — two 32-byte hex hashes joined by a co
 - Live Venice signing address confirmed and ready for `addTEEProvider()`
 - Full attestation chain verified: enclave → Intel TDX quote → signing address → per-request signature
 
-**Remaining adapter work:**
-
-Venice signs `personal_sign(promptHash:responseHash)`. OnlyAgent's current commitment binds six fields: prompt hash, response hash, agent address, contract address, timestamp, and chain ID. The offchain adapter in `scripts/agent.js` will:
-1. Verify Venice's signature against the attested signing address
-2. Extract `promptHash` and `responseHash` from Venice's signed text
-3. Construct OnlyAgent's action-bound commitment using those hashes
-4. Sign the full commitment for onchain verification
-
-This layered model preserves OnlyAgent's stronger binding: Venice proves model execution, OnlyAgent proves that execution was tied to a specific onchain action.
-
-**To activate live Venice TEE integration:**
-
-1. Call `addTEEProvider(0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c)` on deployed contracts
-2. Switch model to `e2ee-qwen-2-5-7b-p` (or any `e2ee-*` model) in `scripts/agent.js`
-3. Finalize the offchain adapter that verifies Venice `personal_sign(promptHash:responseHash)` and binds those verified hashes into the OnlyAgent six-field commitment
 
 ---
 
