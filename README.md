@@ -22,14 +22,16 @@ No proof, no access.
 
 ## What Gets Verified Onchain
 
-The TEE signs a commitment hash:
+Venice's enclave signs `personal_sign(promptHash:responseHash)` — proving a specific model execution occurred.
+
+The offchain adapter verifies that signature against the attested signing address, extracts the confirmed hashes, then constructs the action-bound commitment:
 ```
 keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp, chainId)
 ```
 
-The contract verifies all six fields. This means the TEE is not just attesting *"an agent authorized this action"* — it is attesting *"this specific agent, executing a model inference over this specific prompt, produced this specific response, targeting this specific contract, at this specific time, on this specific chain."*
+The contract verifies this commitment. Venice proves *what model ran*. The commitment proves *that execution was bound to this specific agent, contract, and moment in time*.
 
-The contract does not read the prompt or response text — it sees hashes. But those hashes are binding. Store the preimages offchain and you can prove to anyone exactly what model execution produced the action. The chain commits to it.
+The contract does not read the prompt or response text — it sees hashes. Store the preimages offchain and you can prove exactly what model execution produced the action.
 
 ---
 
@@ -99,13 +101,14 @@ OnlyAgent is designed for systems where AI agents reason over sensitive data but
 
 A Venice TEE model can analyze private information — financial data, governance discussions, negotiation details, or risk signals — without exposing the prompt or reasoning publicly.
 
-The enclave signs a commitment binding the prompt and response to a specific onchain action:
+The enclave signs `personal_sign(promptHash:responseHash)` for the model execution itself.
 
+The offchain adapter then binds those verified hashes to a specific onchain action by constructing:
 ```
 keccak256(promptHash, responseHash, agentAddress, contractAddress, timestamp, chainId)
 ```
 
-The contract verifies this commitment before executing the action.
+The contract verifies this action-bound commitment before executing the call.
 
 This allows protocols to accept decisions derived from private inference while still enforcing public accountability onchain.
 
@@ -194,29 +197,54 @@ This allows autonomous agents to safely execute onchain actions without exposing
 
 ## Venice TEE Integration
 
-OnlyAgent is built for Venice AI's TEE response signing. Venice TEE models are currently served via Phala-backed trusted execution infrastructure. API responses confirm TEE execution via `x-venice-tee: true` and `x-venice-tee-provider: phala` response headers.
+OnlyAgent is built for Venice AI's TEE response signing. Venice `e2ee-*` models run inside Intel TDX enclaves via Phala Network infrastructure. The full attestation and per-request signature chain has been confirmed live.
 
-**Current status:** Venice TEE execution is live — API responses confirm `x-venice-tee: true` via Phala-backed infrastructure. The deployed contracts use a mock TEE signer while the Ethereum-verifiable signing address is not yet exposed in the Venice API response. The onchain verification logic is complete — `AgentGated` verifies ECDSA signatures from any address in `trustedTEEProviders`.
+**Confirmed integration path:**
+
+1. Make a completion request to an `e2ee-*` model — response includes `x-venice-tee: true` and `x-venice-tee-provider: phala` headers confirming TEE execution
+2. `GET /api/v1/tee/attestation?model=e2ee-qwen-2-5-7b-p` returns:
+   - `signing_address`: `0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c` — Ethereum address of the enclave signer
+   - `signing_public_key`: uncompressed ECDSA public key
+   - `verified: true` — Venice server confirms attestation against Intel TDX quote
+   - `tee_hardware: intel-tdx` — hardware enclave confirmed
+3. `GET /api/v1/tee/signature?model=e2ee-qwen-2-5-7b-p&request_id=<id>` returns:
+   - `text`: `promptHash:responseHash` — the exact bytes signed by the enclave
+   - `signature`: ECDSA signature over `personal_sign(text)`
+   - `signing_address`: matches attestation address
+
+**Verified locally:**
+```javascript
+const recovered = ethers.verifyMessage(text, signature);
+// recovered === "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c" ✓
+```
+
+
+Venice uses standard Ethereum `personal_sign` semantics. The signature is fully verifiable onchain using OpenZeppelin's ECDSA library.
+
+**Signed payload format:**
+
+Venice signs `promptHash:responseHash` — two 32-byte hex hashes joined by a colon. These are the enclave-reported hashes of the model input and output.
 
 **What is already done:**
-- Contract verifies TEE signatures from any trusted provider address
-- Mock signer stands in for the enclave during development
-- `trustedTEEProviders` mapping is designed to accept the Venice enclave signing address
+- `AgentGated` verifies ECDSA signatures from any address in `trustedTEEProviders`
+- Live Venice signing address confirmed and ready for `addTEEProvider()`
+- Full attestation chain verified: enclave → Intel TDX quote → signing address → per-request signature
 
-**What remains:**
-- Venice TEE attestation and response-signing endpoints are expected to provide an Ethereum-verifiable signing identity
-- The exact signed payload format is not yet finalized in this integration
-- Once the live payload is available, `scripts/agent.js` will adapt that payload into the OnlyAgent execution commitment flow
-- If Venice signs the full execution context, integration is direct
-- If Venice signs a Venice-defined response payload, the offchain adapter will map that payload into the commitment verification pipeline
-- Add the Venice `signing_address` to `trustedTEEProviders`
+**Remaining adapter work:**
 
-The onchain primitive is complete. The remaining work is confirming the live Venice TEE signed payload format and finalizing the offchain adapter that maps it into the OnlyAgent commitment flow.
+Venice signs `personal_sign(promptHash:responseHash)`. OnlyAgent's current commitment binds six fields: prompt hash, response hash, agent address, contract address, timestamp, and chain ID. The offchain adapter in `scripts/agent.js` will:
+1. Verify Venice's signature against the attested signing address
+2. Extract `promptHash` and `responseHash` from Venice's signed text
+3. Construct OnlyAgent's action-bound commitment using those hashes
+4. Sign the full commitment for onchain verification
 
-When the Venice signing address is exposed:
+This layered model preserves OnlyAgent's stronger binding: Venice proves model execution, OnlyAgent proves that execution was tied to a specific onchain action.
 
-1. Swap model to an `e2ee-*` model in `scripts/agent.js` (e.g. `e2ee-qwen-2-5-7b-p`)
-2. Call `addTEEProvider(veniceSigningAddress)` on your contract
+**To activate live Venice TEE integration:**
+
+1. Call `addTEEProvider(0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c)` on deployed contracts
+2. Switch model to `e2ee-qwen-2-5-7b-p` (or any `e2ee-*` model) in `scripts/agent.js`
+3. Finalize the offchain adapter that verifies Venice `personal_sign(promptHash:responseHash)` and binds those verified hashes into the OnlyAgent six-field commitment
 
 ---
 
@@ -255,7 +283,7 @@ leaderboard/            # live agent reputation UI (GitHub Pages)
 ```bash
 VENICE_API_KEY=           # Venice API key
 AGENT_ADDRESS=            # ERC-8004 registered agent wallet address
-TEE_SIGNER_PRIVATE_KEY=   # mock only — replace with addTEEProvider(veniceSigningAddress) when TEE ships
+TEE_SIGNER_PRIVATE_KEY=   # mock/offchain adapter signer during development
 ONLY_AGENT_ADDRESS=       # deployed OnlyAgent contract
 AGENT_REPUTATION_ADDRESS= # deployed AgentReputation contract
 BASE_RPC_URL=             # Base RPC (default: https://mainnet.base.org)
