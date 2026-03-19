@@ -98,17 +98,18 @@ The leaderboard resolves ENS names for every registered agent, turning wallet ad
 
 ---
 
-## Private Cognition → Public Action
+## Private Inference → Verifiable Actions
 
-OnlyAgent is designed for systems where AI agents run inference over sensitive data but must produce trustworthy public actions.
+OnlyAgent supports workflows where AI agents operate on sensitive data but must produce verifiable public actions.
 
-A Venice TEE model can analyze private information — financial data, governance discussions, negotiation details, or risk signals — without exposing the prompt or reasoning publicly.
+A Venice TEE model can process private inputs without exposing the prompt or response publicly. The enclave signs `personal_sign(promptHash:responseHash)`, producing a verifiable execution artifact.
 
-The enclave signs `personal_sign(promptHash:responseHash)` for the model execution itself.
+The contract verifies the signature onchain and enforces that:
+- the signer is a trusted TEE provider
+- the caller is a registered agent
+- the proof is fresh
 
-The contract verifies the Venice TEE signature by recovering the signer onchain and enforces that the execution is fresh and initiated by a registered agent.
-
-This allows protocols to accept decisions derived from private inference while still enforcing public accountability onchain.
+This allows protocols to accept actions derived from private inference while maintaining public verifiability of execution.
 
 ---
 
