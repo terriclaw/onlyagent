@@ -1,8 +1,8 @@
 import { ethers } from "ethers";
 import "dotenv/config";
 
-const REP_ADDRESS = "0x92d48F5375a86484706549C9fD71Ac3C62E98eb9";
-const ONLYAGENT_ADDRESS = "0x2367Ea8321bC461AAa3C156D92C4cAd73f89F4c5";
+const REP_ADDRESS = "0xB5e35148d21C630faafB10eBF20AE455635B3aE1";
+const ONLYAGENT_ADDRESS = "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D";
 const ABI = ["function addAgentGatedContract(address _agentGated) external"];
 
 async function main() {

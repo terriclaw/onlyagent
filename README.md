@@ -2,7 +2,7 @@
 
 A smart contract primitive for **verifiable AI agent execution onchain**.
 
-`onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider that exposes Ethereum-verifiable ECDSA signatures. The current demo uses a mock TEE signer modeled on Venice AI's documented TEE signing flow.
+`onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider that exposes Ethereum-verifiable ECDSA signatures. The current Base Mainnet demo verifies Venice AI's live TEE signer directly onchain.
 
 ---
 
@@ -37,7 +37,7 @@ The contract does not read the prompt or response text — it sees hashes. Store
 
 ## The Trust Chain
 ```
-Trusted TEE provider (mock signer in current deployment; Venice TEE target integration)
+Trusted TEE provider (live Venice TEE signer in current Base deployment)
 ↓
 signs an Ethereum-verifiable payload that is mapped into the OnlyAgent execution commitment
 ↓
@@ -118,8 +118,8 @@ This allows protocols to accept decisions derived from private inference while s
 
 | Contract | Address |
 |---|---|
-| OnlyAgent (demo) | `0x2367Ea8321bC461AAa3C156D92C4cAd73f89F4c5` |
-| AgentReputation | `0x92d48F5375a86484706549C9fD71Ac3C62E98eb9` |
+| OnlyAgent (demo) | `0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D` |
+| AgentReputation | `0xB5e35148d21C630faafB10eBF20AE455635B3aE1` |
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
 
 ---
@@ -283,7 +283,7 @@ leaderboard/            # live agent reputation UI (GitHub Pages)
 ```bash
 VENICE_API_KEY=           # Venice API key
 AGENT_ADDRESS=            # ERC-8004 registered agent wallet address
-TEE_SIGNER_PRIVATE_KEY=   # mock/offchain adapter signer during development
+TEE_SIGNER_ADDRESS=       # live Venice signer for trustedTEEProviders (0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c)
 ONLY_AGENT_ADDRESS=       # deployed OnlyAgent contract
 AGENT_REPUTATION_ADDRESS= # deployed AgentReputation contract
 BASE_RPC_URL=             # Base RPC (default: https://mainnet.base.org)
