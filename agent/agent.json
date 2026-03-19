@@ -5,15 +5,19 @@
   "framework": "OpenClaw",
   "tools": [
     "venice_api",
-    "bankr_wallet",
+    "venice_attestation",
+    "venice_signature",
     "base_rpc",
     "ethers",
-    "ens_resolver"
+    "ens_resolver",
+    "openclaw_skill",
+    "harness_wallet"
   ],
   "task_categories": [
     "onchain_verification",
     "agent_reputation",
-    "tee_commitment",
+    "tee_execution_proof",
+    "wallet_agnostic_payload_generation",
     "contract_execution",
     "tee_signature_verification"
   ],

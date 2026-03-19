@@ -386,3 +386,57 @@ OnlyAgent enforces execution provenance, not reasoning validity.
 
 This aligns the documentation with actual contract behavior and removes overclaims.
 
+
+---
+
+## Session 9 — Wallet-Agnostic Payload Flow and End-to-End Skill Execution
+
+**Architecture cleanup:**
+The original live Base path used a Bankr-specific submission flow inside `scripts/agent.js`. This worked, but it mixed two concerns:
+- generating a Venice-backed TEE execution proof
+- choosing and using a specific wallet surface for transaction submission
+
+This was refactored so that `scripts/agent.js` now performs only proof generation and transaction payload construction.
+
+**New separation of responsibilities:**
+- `scripts/agent.js` now:
+  - calls the Venice `e2ee-*` model
+  - fetches attestation
+  - fetches per-request signature
+  - verifies the Venice signer locally
+  - builds a wallet-agnostic Base transaction payload for `OnlyAgent.prove()`
+- the harness now:
+  - chooses the wallet surface
+  - submits the transaction payload immediately within the 2-minute freshness window
+
+This made the flow wallet-agnostic without changing the onchain verification model.
+
+**Skill update:**
+`onlyagent-demo` was rewritten to reflect the new architecture:
+- no execution commitment language
+- no Bankr hardcoding
+- explicit explanation of why the proof matters
+- explicit requirement to immediately submit the payload before freshness expiry
+
+**Freshness constraint observed in practice:**
+A first attempt built a correct payload but did not submit it quickly enough. The contract rejected the proof after the 2-minute window elapsed. This validated the freshness check and showed that proof generation and submission must be orchestrated back-to-back.
+
+**End-to-end skill execution:**
+After the skill was updated, TerriClaw executed the full flow successfully:
+1. build Venice-backed TEE proof payload
+2. immediately submit payload with the harness wallet
+3. confirm success on Base Mainnet
+
+**Skill-based Base TX:**
+`0xde0e70ff0f11cdc773bd843497843532fdda313ce0687bca644f4823e77df290`
+
+This established the final demo architecture for OnlyAgent:
+- Venice private cognition
+- wallet-agnostic proof payload generation
+- harness-supplied wallet submission
+- direct onchain signature verification
+- ERC-8004 agent identity gate
+- freshness enforcement
+
+At this point, the demo is no longer tied to a single wallet implementation. OnlyAgent generates a proof payload; the agent harness supplies the submitting wallet.
+

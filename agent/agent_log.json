@@ -418,5 +418,99 @@
     "total_duration_ms": 39600,
     "tool_calls": 5,
     "retries": 0
+  },
+  {
+    "task": "Execute onlyagent-demo skill end-to-end via harness wallet on Base Mainnet",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+    "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "run": 10,
+    "status": "success",
+    "context": "First end-to-end skill-based execution using wallet-agnostic payload generation followed by immediate harness-wallet submission within the freshness window",
+    "steps": [
+      {
+        "step": 1,
+        "action": "execute",
+        "description": "Ran onlyagent-demo skill to build a wallet-agnostic Venice TEE proof payload",
+        "tool": "openclaw_skill",
+        "skill": "onlyagent-demo",
+        "result": "skill_started"
+      },
+      {
+        "step": 2,
+        "action": "execute",
+        "description": "Called live Venice e2ee TEE model and received completion",
+        "tool": "venice_api",
+        "model": "e2ee-qwen-2-5-7b-p",
+        "prompt": "OnlyAgent skill execution. Build and submit payload within freshness window.",
+        "request_id": "chatcmpl-f910fbd934e54e9a9c4885711af54ac8",
+        "tee_confirmed": true,
+        "tee_provider": "phala",
+        "result": "response_received"
+      },
+      {
+        "step": 3,
+        "action": "verify",
+        "description": "Fetched Venice TEE attestation and confirmed live signer identity",
+        "tool": "venice_attestation",
+        "signing_address": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+        "tee_hardware": "intel-tdx",
+        "verified": true,
+        "result": "attestation_verified"
+      },
+      {
+        "step": 4,
+        "action": "verify",
+        "description": "Fetched per-request Venice signature and recovered signer from personal_sign(promptHash:responseHash)",
+        "tool": "venice_signature",
+        "signed_text": "5e2118becea232e71e32f3c941377488de29ca16ed1acd38ba3fb44841f9fc60:da6e9a419112a95f8cd8e52dea9022fffda202650fe02a785efaaa9b895c2fc6",
+        "prompt_hash": "0x5e2118becea232e71e32f3c941377488de29ca16ed1acd38ba3fb44841f9fc60",
+        "response_hash": "0xda6e9a419112a95f8cd8e52dea9022fffda202650fe02a785efaaa9b895c2fc6",
+        "signature": "venice_request_signature",
+        "recovered_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+        "result": "signature_verified"
+      },
+      {
+        "step": 5,
+        "action": "build",
+        "description": "Built wallet-agnostic transaction payload for OnlyAgent prove()",
+        "tool": "agent_js_payload_builder",
+        "contract": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+        "timestamp": 1773952466,
+        "chain_id": 8453,
+        "result": "payload_built"
+      },
+      {
+        "step": 6,
+        "action": "submit",
+        "description": "Immediately submitted payload with harness wallet within freshness window",
+        "tool": "harness_wallet",
+        "wallet_surface": "bankr",
+        "signer": "0x0457b3ded2ba9e56520b21735f4324f6533f93ff",
+        "tx_hash": "0xde0e70ff0f11cdc773bd843497843532fdda313ce0687bca644f4823e77df290",
+        "block_number": 43581567,
+        "gas_used": 188429,
+        "result": "tx_submitted"
+      },
+      {
+        "step": 7,
+        "action": "verify",
+        "description": "Confirmed successful end-to-end skill execution on Base Mainnet",
+        "tool": "base_rpc",
+        "tx_hash": "0xde0e70ff0f11cdc773bd843497843532fdda313ce0687bca644f4823e77df290",
+        "basescan": "https://basescan.org/tx/0xde0e70ff0f11cdc773bd843497843532fdda313ce0687bca644f4823e77df290",
+        "result": "confirmed"
+      }
+    ],
+    "final_output": {
+      "tx_hash": "0xde0e70ff0f11cdc773bd843497843532fdda313ce0687bca644f4823e77df290",
+      "contract": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+      "reputation_contract": "0xB5e35148d21C630faafB10eBF20AE455635B3aE1",
+      "venice_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+      "submission_mode": "wallet_agnostic_payload_plus_harness_wallet"
+    },
+    "total_duration_ms": 0,
+    "tool_calls": 6,
+    "retries": 0
   }
 ]
