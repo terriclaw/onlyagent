@@ -50,6 +50,20 @@ You must report:
 - No valid TEE signature → transaction fails
 - This is enforced by the `onlyAgent` modifier
 
+## Why this matters
+
+OnlyAgent enforces that an onchain action was backed by a Venice TEE execution proof.
+
+The contract verifies:
+
+- the Venice TEE signer produced a valid signature
+- the submitted `promptHash` and `responseHash` match the signed payload
+- the caller is a registered ERC-8004 agent
+- the proof is fresh within the allowed time window
+
+This creates an execution gate between private inference and onchain action.
+
+
 ---
 
 ## Mental model
