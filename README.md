@@ -194,9 +194,9 @@ This allows autonomous agents to safely execute onchain actions without exposing
 
 ## Venice TEE Integration
 
-OnlyAgent is built for Venice AI's TEE response signing (Intel TDX). Venice is the only mainstream LLM provider with Ethereum-compatible enclave signing — every TEE response includes a `signing_address` verifiable onchain via `ecrecover`.
+OnlyAgent is built for Venice AI's TEE response signing. Venice TEE models are currently served via Phala-backed trusted execution infrastructure. API responses confirm TEE execution via `x-venice-tee: true` and `x-venice-tee-provider: phala` response headers.
 
-**Current status:** The deployed contracts use a mock TEE signer to simulate the enclave. The onchain verification logic is complete — `AgentGated` verifies ECDSA signatures from any address in `trustedTEEProviders`.
+**Current status:** Venice TEE execution is live — API responses confirm `x-venice-tee: true` via Phala-backed infrastructure. The deployed contracts use a mock TEE signer while the Ethereum-verifiable signing address is not yet exposed in the Venice API response. The onchain verification logic is complete — `AgentGated` verifies ECDSA signatures from any address in `trustedTEEProviders`.
 
 **What is already done:**
 - Contract verifies TEE signatures from any trusted provider address
@@ -213,9 +213,9 @@ OnlyAgent is built for Venice AI's TEE response signing (Intel TDX). Venice is t
 
 The onchain primitive is complete. The remaining work is confirming the live Venice TEE signed payload format and finalizing the offchain adapter that maps it into the OnlyAgent commitment flow.
 
-When Venice TEE ships:
+When the Venice signing address is exposed:
 
-1. Swap model to `tee-qwen3-235b-a22b-thinking-2507` in `scripts/agent.js`
+1. Swap model to an `e2ee-*` model in `scripts/agent.js` (e.g. `e2ee-qwen-2-5-7b-p`)
 2. Call `addTEEProvider(veniceSigningAddress)` on your contract
 
 ---
