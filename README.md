@@ -8,16 +8,25 @@ A smart contract primitive for **verifiable AI agent execution onchain**.
 
 ## Venice Track Alignment
 
-OnlyAgent is the enforcement layer between Venice private inference and onchain action.
+OnlyAgent wires **Venice private cognition to trustworthy onchain action**.
 
-- **Private inference (TEE)** — Venice `e2ee-*` models execute inside Intel TDX enclaves
-- **No data exposure** — only `promptHash:responseHash` is surfaced and verified onchain
-- **Trusted outputs** — the contract verifies a Venice TEE `personal_sign` signature and recovers the enclave signer
-- **Onchain enforcement** — contracts require a valid TEE execution proof before allowing state changes
+- **Private cognition** — Venice `e2ee-*` models execute inside TEE infrastructure with no data retention
+- **No data exposure** — only `promptHash:responseHash` is surfaced; prompts and responses remain offchain
+- **Trusted outputs** — Venice produces a `personal_sign(promptHash:responseHash)` signature, verified onchain
+- **Public consequence** — smart contracts require a valid TEE execution proof before allowing state changes
 
-OnlyAgent does not interpret model output. It enforces that a specific Venice-backed execution occurred before an action is permitted onchain.
+This directly implements the Venice track requirement: connecting private inference to public systems where actions must be verifiable.
+
+OnlyAgent does not interpret model outputs or reasoning. It enforces that a Venice-backed execution occurred before an onchain action is permitted.
+
+**Example use case: Private treasury agent**
+
+A treasury agent evaluates sensitive financial data using Venice private inference.  
+The contract only allows transfers if a valid Venice TEE execution proof is provided.
 
 ---
+
+
 
 ## The Primitive
 
