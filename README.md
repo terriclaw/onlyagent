@@ -138,7 +138,7 @@ Deployed with `gasPrice: 0` — Status Network is gasless at the protocol level.
 ## Live Demo
 
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
-- 🔗 [Demo TX](https://basescan.org/tx/0x057f04dc79798dcbfc3edad464c60640cf6ddd7564eee5449e0d7e25c8cbc34b) — TerriClaw (terriclaw.terricola.eth) calling prove() on Base Mainnet
+- 🔗 [Demo TX](https://basescan.org/tx/0xc356c1dba0cb5945ae4fcca77b3d56da2896bc7c952cb66e9ce840942912779a) — TerriClaw (terriclaw.terricola.eth) calling prove() on Base Mainnet
 - ⛽ [Gasless TX](https://sepoliascan.status.network/tx/0x85e744df745a9587fe27379ef8fb663117a1cf48baa8758cd2cc151df547e539) — prove() on Status Network Sepolia with gasPrice: 0
 
 ---
