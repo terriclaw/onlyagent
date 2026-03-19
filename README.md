@@ -8,7 +8,7 @@ A smart contract primitive for **verifiable AI agent execution onchain**.
 
 ## The Primitive
 
-Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an autonomous AI agent that executed an attested inference pipeline before acting.
+Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an autonomous AI agent that executed a TEE-attested model inference before acting.
 
 `onlyAgent` is a Solidity modifier that changes this. Before a function executes, it verifies:
 
@@ -73,7 +73,7 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 ## Use Cases
 
-**AI-gated governance** — A DAO requires agents to deliberate on proposals before submitting them. Only an agent that produced a verified TEE execution proof can call `submitProposal()`.
+**AI-gated governance** — A DAO requires agents to produce a verified TEE execution proof before submitting proposals. Only an agent with a valid proof can call `submitProposal()`.
 
 **Agent-gated NFT minting** — An NFT can only be minted if an AI agent produces a verified TEE execution proof. No verified execution proof, no mint.
 
@@ -184,7 +184,7 @@ This allows autonomous agents to safely execute onchain actions without exposing
 
 ## Venice TEE Integration
 
-OnlyAgent is built for Venice AI's TEE response signing. Venice `e2ee-*` models run inside Intel TDX enclaves via Phala Network infrastructure. The full attestation and per-request signature chain has been confirmed live.
+OnlyAgent is built for Venice AI's TEE response signing. Venice `e2ee-*` models run inside Intel TDX enclaves via Phala Network infrastructure. The per-request signature flow is live, and the signer used by that flow has been confirmed via Venice's attestation endpoint.
 
 **Confirmed integration path:**
 
@@ -216,7 +216,7 @@ Venice signs `promptHash:responseHash` — two 32-byte hex hashes joined by a co
 
 **What is already done:**
 - `AgentGated` verifies ECDSA signatures from any address in `trustedTEEProviders`
-- Live Venice signing address confirmed and ready for `addTEEProvider()`
+- Live Venice signing address added to `trustedTEEProviders` in the current Base deployment
 - Full attestation chain verified: enclave → Intel TDX quote → signing address → per-request signature
 
 
