@@ -342,3 +342,19 @@ At this point, OnlyAgent has:
 - a simplified single-network active surface
 - repeated successful proofs using direct onchain verification of Venice TEE execution proofs
 
+
+### Additional Validation — Third Consecutive Live Venice Proof
+
+A third full Base Mainnet proof was executed using the same prompt as the prior run.
+
+Notable result:
+- the prompt hash remained identical
+- the response hash changed
+- the Venice signature changed accordingly
+- the onchain proof still succeeded
+
+This confirms that OnlyAgent is verifying unique execution instances, not just prompt inputs. Repeated runs over the same prompt still produce distinct, valid proofs when the model output differs.
+
+**Third live Base TX:**
+`0x658c0f6aef71cfef606f72079809acdd408d3cd47b6026172ac77c3441c53567`
+
