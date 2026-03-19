@@ -13,7 +13,7 @@ Any wallet can call any smart contract. There is no way to distinguish a human p
 `onlyAgent` is a Solidity modifier that changes this. Before a function executes, it verifies:
 
 1. **ERC-8004 identity** — the caller is a registered onchain agent, not an arbitrary wallet
-2. **TEE execution proof** — a TEE-signed payload proving a specific prompt and response were executed by a trusted model
+2. **TEE execution proof** — a TEE-signed payload proving a specific promptHash:responseHash pair was signed by a trusted TEE provider
 3. **Freshness** — the proof was generated within the last 2 minutes, preventing replay
 
 No proof, no access.
@@ -24,13 +24,13 @@ No proof, no access.
 
 Venice's enclave signs `personal_sign(promptHash:responseHash)` — proving a specific model execution occurred.
 
-The contract reconstructs `promptHash:responseHash`, verifies the signature using standard Ethereum `personal_sign` semantics, and checks that the recovered signer matches a trusted TEE provider.
+The contract reconstructs `promptHash:responseHash`, verifies the signature using Ethereum `personal_sign` semantics and recovers the signer, and checks that the recovered signer matches a trusted TEE provider.
 
-The execution is bound to context by onchain checks:
+The contract enforces execution context separately:
 - `msg.sender` must be an ERC-8004 registered agent
 - `timestamp` must be within the freshness window
 
-Venice proves *what model ran*. The contract enforces *who is acting and when*.
+Venice proves a specific execution occurred. The contract enforces *who is acting and when*.
 
 The contract does not read the prompt or response text — it sees hashes. Store the preimages offchain and you can prove exactly what model execution produced the action.
 
@@ -42,7 +42,7 @@ The contract does not read the prompt or response text — it sees hashes. Store
 ```
 Trusted TEE provider (live Venice TEE signer in current Base deployment)
 ↓
-signs an Ethereum-verifiable execution proof that OnlyAgent verifies directly onchain
+signs an Ethereum-verifiable payload (`promptHash:responseHash`) that OnlyAgent verifies directly onchain
 ↓
 ERC-8004 registered agent identity
 ↓
@@ -79,7 +79,7 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 **Autonomous treasury execution** — Agents managing a protocol treasury must produce an attested execution proof before executing transfers. Every fund movement is traceable to a specific AI output.
 
-**Cross-chain risk guards** — Before funds are bridged, an AI risk agent must reason about the transfer and produce a verified TEE execution proof. The bridge contract verifies it before releasing funds.
+**Cross-chain risk guards** — Before funds are bridged, an AI risk agent must evaluate the transfer and produce a verified TEE execution proof. The bridge contract verifies it before releasing funds.
 
 ---
 
@@ -100,13 +100,13 @@ The leaderboard resolves ENS names for every registered agent, turning wallet ad
 
 ## Private Cognition → Public Action
 
-OnlyAgent is designed for systems where AI agents reason over sensitive data but must produce trustworthy public actions.
+OnlyAgent is designed for systems where AI agents run inference over sensitive data but must produce trustworthy public actions.
 
 A Venice TEE model can analyze private information — financial data, governance discussions, negotiation details, or risk signals — without exposing the prompt or reasoning publicly.
 
 The enclave signs `personal_sign(promptHash:responseHash)` for the model execution itself.
 
-The contract verifies the Venice TEE signature directly onchain and enforces that the execution is fresh and initiated by a registered agent.
+The contract verifies the Venice TEE signature by recovering the signer onchain and enforces that the execution is fresh and initiated by a registered agent.
 
 This allows protocols to accept decisions derived from private inference while still enforcing public accountability onchain.
 
@@ -209,6 +209,8 @@ const recovered = ethers.verifyMessage(text, signature);
 
 
 Venice uses standard Ethereum `personal_sign` semantics. The signature is fully verifiable onchain using OpenZeppelin's ECDSA library.
+
+The Intel TDX attestation is verified offchain by Venice. The contract trusts the reported signing address and verifies signatures from that address.
 
 **Signed payload format:**
 
