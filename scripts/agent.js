@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { execSync } from "child_process";
 import "dotenv/config";
 
 // ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -20,12 +19,17 @@ async function resolveAgentENS(address) {
     const provider = new ethers.JsonRpcProvider("https://eth.llamarpc.com");
     const name = await provider.lookupAddress(address);
     return name || address;
-  } catch { return address; }
+  } catch {
+    return address;
+  }
 }
 
 // ── VENICE ────────────────────────────────────────────────────────────────────
 function authHeaders() {
-  return { "Authorization": `Bearer ${process.env.VENICE_API_KEY}`, "Content-Type": "application/json" };
+  return {
+    "Authorization": `Bearer ${process.env.VENICE_API_KEY}`,
+    "Content-Type": "application/json"
+  };
 }
 
 async function callVenice(prompt) {
@@ -35,43 +39,79 @@ async function callVenice(prompt) {
     body: JSON.stringify({
       model: VENICE_MODEL,
       messages: [{ role: "user", content: prompt }],
-      venice_parameters: { include_venice_system_prompt: false, strip_thinking_response: false }
+      venice_parameters: {
+        include_venice_system_prompt: false,
+        strip_thinking_response: false
+      }
     })
   });
+
   const teeConfirmed = res.headers.get("x-venice-tee") === "true";
   const teeProvider  = res.headers.get("x-venice-tee-provider");
   const data = await res.json();
+
   if (data.error) throw new Error(`Venice error: ${JSON.stringify(data.error)}`);
+
   return {
-    response:  data.choices[0].message.content,
+    response: data.choices[0].message.content,
     reasoning: data.choices[0].message.reasoning_content,
     requestId: data.id,
-    teeConfirmed, teeProvider
+    teeConfirmed,
+    teeProvider
   };
 }
 
 async function fetchAttestation() {
-  const res = await fetch(`${VENICE_BASE}/tee/attestation?model=${VENICE_MODEL}`, { headers: authHeaders() });
+  const res = await fetch(`${VENICE_BASE}/tee/attestation?model=${VENICE_MODEL}`, {
+    headers: authHeaders()
+  });
   const data = await res.json();
   if (!data.signing_address) throw new Error(`Attestation failed: ${JSON.stringify(data)}`);
   return data;
 }
 
 async function fetchSignature(requestId) {
-  const res = await fetch(`${VENICE_BASE}/tee/signature?model=${VENICE_MODEL}&request_id=${requestId}`, { headers: authHeaders() });
+  const res = await fetch(`${VENICE_BASE}/tee/signature?model=${VENICE_MODEL}&request_id=${requestId}`, {
+    headers: authHeaders()
+  });
   const data = await res.json();
   if (!data.signature) throw new Error(`Signature fetch failed: ${JSON.stringify(data)}`);
   return data;
 }
 
+// ── TX BUILDING ───────────────────────────────────────────────────────────────
+function buildOnlyAgentTx({ promptHash, responseHash, timestamp, teeSignature }) {
+  const calldata = iface.encodeFunctionData("prove", [
+    promptHash,
+    responseHash,
+    timestamp,
+    teeSignature
+  ]);
+
+  return {
+    to: process.env.ONLY_AGENT_ADDRESS,
+    data: calldata,
+    value: "0",
+    chainId: 8453
+  };
+}
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 async function main() {
-  if (!agentAddress) { console.error("❌ AGENT_ADDRESS not set"); process.exit(1); }
+  if (!agentAddress) {
+    console.error("❌ AGENT_ADDRESS not set");
+    process.exit(1);
+  }
+  if (!process.env.ONLY_AGENT_ADDRESS) {
+    console.error("❌ ONLY_AGENT_ADDRESS not set");
+    process.exit(1);
+  }
 
-  const prompt = process.argv[2] || "Should I execute this onchain transaction? Assess the request and decide.";
+  const prompt =
+    process.argv[2] || "Should I execute this onchain transaction? Assess the request and decide.";
 
   console.log("═══════════════════════════════════════");
-  console.log("  OnlyAgent — Proving AI Execution");
+  console.log("  OnlyAgent — Build TEE Proof Payload");
   console.log("═══════════════════════════════════════");
   const agentENS = await resolveAgentENS(agentAddress);
   console.log("Agent:    ", agentENS === agentAddress ? agentAddress : `${agentENS} (${agentAddress})`);
@@ -80,7 +120,7 @@ async function main() {
   console.log("Prompt:   ", prompt);
 
   // 1. Venice completion
-  console.log("\n[1/6] Calling Venice (e2ee TEE model)...");
+  console.log("\n[1/5] Calling Venice (e2ee TEE model)...");
   const { response, reasoning, requestId, teeConfirmed, teeProvider } = await callVenice(prompt);
   console.log("Request ID:   ", requestId);
   console.log("TEE confirmed:", teeConfirmed, teeProvider ? `(${teeProvider})` : "");
@@ -88,54 +128,72 @@ async function main() {
   if (reasoning) console.log("Reasoning:    ", reasoning.slice(0, 80) + "...");
 
   // 2. Attestation
-  console.log("\n[2/6] Fetching Venice TEE attestation...");
+  console.log("\n[2/5] Fetching Venice TEE attestation...");
   const attestation = await fetchAttestation();
   console.log("Signer:       ", attestation.signing_address);
   console.log("Hardware:     ", attestation.tee_hardware);
   console.log("Verified:     ", attestation.verified);
 
   // 3. Per-request signature
-  console.log("\n[3/6] Fetching Venice request signature...");
+  console.log("\n[3/5] Fetching Venice request signature...");
   const sigPayload = await fetchSignature(requestId);
   console.log("Signed text:  ", sigPayload.text);
 
   // 4. Verify locally
-  console.log("\n[4/6] Verifying Venice signature...");
+  console.log("\n[4/5] Verifying Venice signature...");
   const recovered = ethers.verifyMessage(sigPayload.text, sigPayload.signature);
   if (recovered.toLowerCase() !== attestation.signing_address.toLowerCase()) {
     throw new Error(`Signer mismatch: recovered ${recovered}, attested ${attestation.signing_address}`);
   }
   console.log("✓ Signature verified:", recovered);
 
-  // Extract hashes from Venice's signed text
   const [promptHashRaw, responseHashRaw] = sigPayload.text.split(":");
   const promptHash = `0x${promptHashRaw.replace(/^0x/, "")}`;
   const responseHash = `0x${responseHashRaw.replace(/^0x/, "")}`;
   console.log("Prompt hash:  ", promptHash);
   console.log("Response hash:", responseHash);
 
-  // Sanity check: confirm Solidity will reconstruct the same text
-  // Check if Venice text matches what _hexStringNoPrefix will produce in Solidity (no 0x, lowercase)
   const ph = promptHash.slice(2).toLowerCase();
   const rh = responseHash.slice(2).toLowerCase();
   const reconstructed = `${ph}:${rh}`;
-  console.log("Venice text:    ", sigPayload.text);
-  console.log("No-prefix recon:", reconstructed);
-  console.log("Contract match: ", reconstructed === sigPayload.text ? "✓ _hexStringNoPrefix will verify" : "⚠ MISMATCH — Venice uses 0x prefix, swap to Strings.toHexString in contract");
+  console.log("Venice text:     ", sigPayload.text);
+  console.log("No-prefix recon: ", reconstructed);
+  console.log("Contract match:  ", reconstructed === sigPayload.text ? "✓ _hexStringNoPrefix will verify" : "⚠ mismatch");
 
-  // 5. Timestamp
-  console.log("\n[5/6] Preparing transaction...");
+  // 5. Build tx payload
+  console.log("\n[5/5] Building transaction payload...");
   const timestamp = Math.floor(Date.now() / 1000);
   console.log("Timestamp:    ", timestamp);
 
-  // 6. Submit via Bankr — Venice signature goes straight to contract
-  console.log("\n[6/6] Submitting via Bankr...");
-  const calldata = iface.encodeFunctionData("prove", [promptHash, responseHash, timestamp, sigPayload.signature]);
-  const bankrCmd = `bankr prompt "Submit this transaction on base: {\\"to\\": \\"${process.env.ONLY_AGENT_ADDRESS}\\", \\"data\\": \\"${calldata}\\", \\"value\\": \\"0\\", \\"chainId\\": 8453}"`;
-  const result = execSync(bankrCmd).toString();
-  console.log(result);
+  const tx = buildOnlyAgentTx({
+    promptHash,
+    responseHash,
+    timestamp,
+    teeSignature: sigPayload.signature
+  });
 
-  console.log("\n👾 Venice TEE attested execution verified directly onchain. No adapter signer.");
+  const output = {
+    meta: {
+      agentAddress,
+      model: VENICE_MODEL,
+      requestId,
+      teeConfirmed,
+      teeProvider,
+      teeSigner: attestation.signing_address,
+      teeHardware: attestation.tee_hardware,
+      attestationVerified: attestation.verified,
+      prompt,
+      promptHash,
+      responseHash,
+      timestamp
+    },
+    tx
+  };
+
+  console.log("\nTX Payload JSON:");
+  console.log(JSON.stringify(output, null, 2));
+
+  console.log("\n👾 Venice TEE execution proof built. Submit this payload with your harness wallet.");
 }
 
 main().catch((err) => {

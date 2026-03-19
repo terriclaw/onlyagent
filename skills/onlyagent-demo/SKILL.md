@@ -1,6 +1,6 @@
 ---
 name: onlyagent-demo
-description: Use to prove Venice TEE execution onchain via OnlyAgent. The agent performs private inference, verifies the Venice TEE signature, and executes a gated transaction on Base.
+description: Use to prove Venice TEE execution onchain via OnlyAgent. The agent performs private inference, verifies the Venice TEE signature, builds a gated transaction payload, and submits it using the harness wallet on Base.
 metadata: {"openclaw": {"emoji": "🤖"}}
 ---
 
@@ -17,18 +17,21 @@ This executes a real transaction on Base.
 - Calls a Venice `e2ee-*` model (TEE-backed, no data retention)
 - Fetches attestation and per-request signature
 - Verifies `personal_sign(promptHash:responseHash)`
-- Submits a transaction to OnlyAgent on Base
+- Builds a transaction payload for OnlyAgent on Base
+- The harness submits the payload using its own wallet
 - Only succeeds if the Venice TEE signer is trusted onchain
 
 ---
 
 ## Run the demo
 
-If AGENT_ADDRESS is not set, ask the user for their Bankr EVM address.
+If AGENT_ADDRESS is not set, ask the user for their agent wallet address.
 
 Execute:
 
-cd ~/onlyagent && AGENT_ADDRESS=<bankr-address> node scripts/agent.js "<prompt>"
+cd ~/onlyagent && AGENT_ADDRESS=<agent-address> node scripts/agent.js "<prompt>"
+
+Then submit the returned `tx` payload with the harness wallet.
 
 ---
 
@@ -62,7 +65,6 @@ The contract verifies:
 - the proof is fresh within the allowed time window
 
 This creates an execution gate between private inference and onchain action.
-
 
 ---
 
