@@ -43,6 +43,6 @@ contract OnlyAgent is AgentGated {
             block.timestamp
         );
 
-        return "hey real agent";
+        return "onlyAgent:verified";
     }
 }
