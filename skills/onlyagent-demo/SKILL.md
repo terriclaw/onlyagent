@@ -31,7 +31,9 @@ Execute:
 
 cd ~/onlyagent && AGENT_ADDRESS=<agent-address> node scripts/agent.js "<prompt>"
 
-Then submit the returned `tx` payload with the harness wallet.
+Immediately submit the returned `tx` payload with the harness wallet.
+
+Do not wait between payload generation and submission. The proof expires after 2 minutes.
 
 ---
 
@@ -43,6 +45,7 @@ You must report:
 - TEE verification status and signer address
 - Prompt hash and response hash
 - Transaction hash (BaseScan link)
+- Confirmation that submission occurred within the freshness window
 
 ---
 
@@ -51,6 +54,7 @@ You must report:
 - Venice signs `promptHash:responseHash` using `personal_sign`
 - The contract verifies this signature directly onchain
 - No valid TEE signature → transaction fails
+- The proof must be submitted within 2 minutes of payload generation
 - This is enforced by the `onlyAgent` modifier
 
 ## Why this matters
