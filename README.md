@@ -75,7 +75,7 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 **AI-gated governance** — A DAO requires agents to deliberate on proposals before submitting them. Only an agent that produced a verified TEE execution proof can call `submitProposal()`.
 
-**Agent-justified NFT minting** — An NFT can only be minted if an AI agent produced a verified TEE execution proof justifying the mint. No verified execution proof, no mint.
+**Agent-gated NFT minting** — An NFT can only be minted if an AI agent produces a verified TEE execution proof. No verified execution proof, no mint.
 
 **Autonomous treasury execution** — Agents managing a protocol treasury must produce an attested execution proof before executing transfers. Every fund movement is traceable to a specific AI output.
 
