@@ -1,6 +1,6 @@
 ---
 name: onlyagent-demo
-description: Run the OnlyAgent demo and prove attested AI execution onchain. The agent performs a model inference, produces a TEE-signed execution commitment, and submits a prove() transaction to the OnlyAgent contract.
+description: Run the OnlyAgent demo and prove attested AI execution onchain. The agent performs a model inference, produces a Venice TEE-signed (promptHash:responseHash) which is bound into an onchain execution commitment, and submits a prove() transaction to the OnlyAgent contract.
 metadata: {"openclaw": {"emoji": "🤖"}}
 ---
 
@@ -10,6 +10,7 @@ metadata: {"openclaw": {"emoji": "🤖"}}
 
 Before running, ask the user for their Bankr EVM address if AGENT_ADDRESS is not set.
 
+Note: Venice signs promptHash:responseHash. The agent verifies this signature and constructs the onchain commitment.
 Run the full proof flow:
 ```bash
 cd ~/onlyagent && AGENT_ADDRESS=<your-bankr-evm-address> node scripts/agent.js "<prompt>"
@@ -22,7 +23,7 @@ cd ~/onlyagent && mkdir -p logs && AGENT_ADDRESS=<your-bankr-evm-address> node s
 
 After running, report:
 - Venice model output summary (2-3 sentences)
-- Commitment hash
+- Derived execution commitment (keccak256 binding prompt, response, agent, contract, timestamp, chainId)
 - Transaction hash with Basescan link
 - Block number confirmed in
 
@@ -44,6 +45,6 @@ All transactions on Status Network are gasless (gasPrice: 0). No ETH balance req
 
 After running, report:
 - Venice model output summary (2-3 sentences)
-- Commitment hash
+- Derived execution commitment (keccak256 binding prompt, response, agent, contract, timestamp, chainId)
 - Transaction hash with sepoliascan.status.network link
 - Block number confirmed in
