@@ -6,6 +6,19 @@ A smart contract primitive for **verifiable AI agent execution onchain**.
 
 ---
 
+## Venice Track Alignment
+
+OnlyAgent is the enforcement layer between Venice private inference and onchain action.
+
+- **Private inference (TEE)** — Venice `e2ee-*` models execute inside Intel TDX enclaves
+- **No data exposure** — only `promptHash:responseHash` is surfaced and verified onchain
+- **Trusted outputs** — the contract verifies a Venice TEE `personal_sign` signature and recovers the enclave signer
+- **Onchain enforcement** — contracts require a valid TEE execution proof before allowing state changes
+
+OnlyAgent does not interpret model output. It enforces that a specific Venice-backed execution occurred before an action is permitted onchain.
+
+---
+
 ## The Primitive
 
 Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an autonomous AI agent that executed a TEE-attested model inference before acting.
