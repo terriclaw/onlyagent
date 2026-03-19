@@ -151,7 +151,7 @@ contract MyContract is AgentGated {
         external
         onlyAgent(promptHash, responseHash, timestamp, teeSignature)
     {
-        // only verified AI agents can reach here
+        // only registered agents with a valid trusted TEE execution proof can reach here
     }
 }
 ```
