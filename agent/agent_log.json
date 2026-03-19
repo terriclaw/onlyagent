@@ -328,5 +328,20 @@
     "total_duration_ms": 17600,
     "tool_calls": 5,
     "retries": 0
+  },
+  {
+    "timestamp": 1773904825,
+    "type": "onlyagent_proof",
+    "network": "base",
+    "contract": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+    "reputation_contract": "0xB5e35148d21C630faafB10eBF20AE455635B3aE1",
+    "agent": "0x0457b3ded2ba9e56520b21735f4324f6533f93ff",
+    "ens": "terriclaw.terricola.eth",
+    "venice_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+    "model": "e2ee-qwen-2-5-7b-p",
+    "tee_hardware": "intel-tdx",
+    "tx_hash": "0x242698ffe3bc6e6f53da3b9ba4efe6c85f7d8b4aca57a9809accf6d20a258d1e",
+    "status": "success",
+    "notes": "Second successful Base proof using direct Venice TEE signature verification (no adapter signer)"
   }
 ]

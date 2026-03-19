@@ -287,3 +287,58 @@ This is the first full end-to-end OnlyAgent proof using:
 - real Bankr agent execution
 
 At this point, OnlyAgent is no longer a mock TEE demo on Base Mainnet. The Venice-backed execution gate is live.
+
+---
+
+## Session 8 — Base-Only Cleanup and Repeat Live Venice Proof
+
+**Project surface cleanup:**
+After the live Venice TEE path was working on Base Mainnet, the active Status Network Sepolia path was removed from the project surface to simplify the system and keep the public story coherent.
+
+**What changed:**
+- Removed Status Network from active runtime configuration
+- Removed Status chain config from `hardhat.config.js`
+- Removed Status references from leaderboard runtime config
+- Removed Status environment variables from active `.env`
+- Deleted `MockERC8004.sol`
+- Kept historical Status references in `agent_log.json` and this collaboration log for chronology integrity
+
+**Reasoning:**
+The live Venice-native Base Mainnet path had become the real system. Keeping a second inactive execution path in docs, runtime config, and UI added noise and made the trust model less clear. The project is now intentionally Base-only in its active surface area.
+
+**README correction:**
+The documentation was updated to remove stale "execution commitment" and adapter-binding language. The current Base system verifies a Venice TEE execution proof directly onchain:
+- Venice signs `personal_sign(promptHash:responseHash)`
+- the contract reconstructs the exact text
+- the contract recovers the signer and checks it against trusted TEE providers
+- ERC-8004 identity and timestamp freshness are enforced onchain
+
+This shifted the language from "execution commitment" to the more accurate "TEE execution proof."
+
+**Repeat live proof run:**
+A second full end-to-end proof was executed on Base Mainnet using the live Venice path to confirm the system was stable across repeated runs.
+
+**Flow:**
+1. Call live Venice `e2ee-qwen-2-5-7b-p`
+2. Fetch attestation
+3. Fetch per-request signature
+4. Verify signer locally with `ethers.verifyMessage`
+5. Submit `prove()` via Bankr
+6. Verify success onchain
+
+**Result:**
+- Venice TEE confirmed: `intel-tdx`
+- Live signer: `0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c`
+- Base transaction succeeded
+- No mock signer
+- No adapter signer
+- Direct onchain verification path remained stable on repeated execution
+
+**Second live Base TX:**
+`0x242698ffe3bc6e6f53da3b9ba4efe6c85f7d8b4aca57a9809accf6d20a258d1e`
+
+At this point, OnlyAgent has:
+- a live Venice-native Base Mainnet path
+- a simplified single-network active surface
+- repeated successful proofs using direct onchain verification of Venice TEE execution proofs
+
