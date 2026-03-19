@@ -19,6 +19,8 @@ This directly implements the Venice track requirement: connecting private infere
 
 OnlyAgent does not interpret model outputs or reasoning. It enforces that a Venice-backed execution occurred before an onchain action is permitted.
 
+This converts private cognition into an enforceable condition for onchain execution.
+
 **Example use case: Private treasury agent**
 
 A treasury agent evaluates sensitive financial data using Venice private inference.  
@@ -52,9 +54,9 @@ The contract enforces execution context separately:
 - `msg.sender` must be an ERC-8004 registered agent
 - `timestamp` must be within the freshness window
 
-Venice proves a specific execution occurred. The contract enforces *who is acting and when*.
+Venice proves that a specific model execution occurred inside a TEE. The contract enforces *who is acting and when*.
 
-The contract does not read the prompt or response text — it sees hashes. Store the preimages offchain and you can prove exactly what model execution produced the action.
+The contract does not read the prompt or response text — it sees hashes.
 
 ---
 
