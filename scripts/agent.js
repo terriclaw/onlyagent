@@ -9,9 +9,35 @@ const agentAddress = process.env.AGENT_ADDRESS;
 
 // ── CONTRACT ABI ──────────────────────────────────────────────────────────────
 const ABI = [
-  "function prove(bytes32 promptHash, bytes32 responseHash, uint256 timestamp, bytes memory teeSignature) external returns (string memory)"
+  "function prove(bytes32 promptHash, bytes32 responseHash, uint256 timestamp, bytes memory teeSignature) external returns (string memory)",
+  "function proveApproved(bytes32 promptHash, bytes32 responseHash, uint256 timestamp, bytes memory teeSignature) external returns (string memory)"
 ];
 const iface = new ethers.Interface(ABI);
+
+const ONLYAGENT_MODE = process.env.ONLYAGENT_MODE || "prove";
+
+function getDefaultPrompt() {
+  if (ONLYAGENT_MODE === "proveApproved") {
+    return `You are authorizing an onchain action.
+
+Approve ONLY if ALL conditions are true:
+- contract == ${process.env.ONLY_AGENT_ADDRESS}
+- function == proveApproved()
+- caller == ${agentAddress}
+- purpose == verify Venice TEE execution onchain
+
+Reply with exactly one word:
+YES or NO
+
+Rules:
+- No punctuation
+- No explanation
+- Uppercase only
+- Output must be exactly YES or NO`;
+  }
+
+  return "Should I execute this onchain transaction? Assess the request and decide.";
+}
 
 // ── ENS ───────────────────────────────────────────────────────────────────────
 async function resolveAgentENS(address) {
@@ -81,7 +107,8 @@ async function fetchSignature(requestId) {
 
 // ── TX BUILDING ───────────────────────────────────────────────────────────────
 function buildOnlyAgentTx({ promptHash, responseHash, timestamp, teeSignature }) {
-  const calldata = iface.encodeFunctionData("prove", [
+  const fn = ONLYAGENT_MODE === "proveApproved" ? "proveApproved" : "prove";
+  const calldata = iface.encodeFunctionData(fn, [
     promptHash,
     responseHash,
     timestamp,
@@ -108,7 +135,7 @@ async function main() {
   }
 
   const prompt =
-    process.argv[2] || "Should I execute this onchain transaction? Assess the request and decide.";
+    process.argv[2] || getDefaultPrompt();
 
   console.log("═══════════════════════════════════════");
   console.log("  OnlyAgent — Build TEE Proof Payload");
@@ -117,6 +144,7 @@ async function main() {
   console.log("Agent:    ", agentENS === agentAddress ? agentAddress : `${agentENS} (${agentAddress})`);
   console.log("Contract: ", process.env.ONLY_AGENT_ADDRESS);
   console.log("Model:    ", VENICE_MODEL);
+  console.log("Mode:     ", ONLYAGENT_MODE);
   console.log("Prompt:   ", prompt);
 
   // 1. Venice completion
