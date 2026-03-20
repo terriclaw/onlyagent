@@ -141,7 +141,7 @@ This allows protocols to accept actions derived from private inference while mai
 
 | Contract | Address |
 |---|---|
-| OnlyAgent (demo) | `0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D` |
+| OnlyAgent (demo) | `0x2248bb37821f8675B4de7786c8C5d1E15333E869` |
 | AgentReputation | `0xB5e35148d21C630faafB10eBF20AE455635B3aE1` |
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
 
