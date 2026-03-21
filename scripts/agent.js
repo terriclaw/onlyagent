@@ -14,11 +14,18 @@ const VENICE_MODEL = "e2ee-qwen-2-5-7b-p";
 const VENICE_BASE = "https://api.venice.ai/api/v1";
 const agentAddress = process.env.AGENT_ADDRESS;
 const ONLYAGENT_MODE = process.env.ONLYAGENT_MODE || "prove";
+const TRUST_WINDOW_SECONDS = 10 * 24 * 60 * 60;
+const MIN_SCORE = 1;
+const MIN_UNIQUE_CONTRACTS = 1;
 
 const ABI = [
   "function prove(bytes32 promptHash, bytes32 responseHash, uint256 timestamp, bytes memory teeSignature) external returns (string memory)"
 ];
 const iface = new ethers.Interface(ABI);
+
+const REPUTATION_ABI = [
+  "function getAgentInfo(address agent) view returns (uint256 score, uint256 totalActions, uint256 uniqueContracts, uint256 firstActionAt, uint256 lastActionAt)"
+];
 
 function getDefaultPrompt() {
   if (ONLYAGENT_MODE === "decision") {
@@ -107,6 +114,47 @@ async function fetchSignature(requestId) {
   return data;
 }
 
+async function getTrustInfo(agent) {
+  if (!process.env.AGENT_REPUTATION_ADDRESS || !process.env.BASE_RPC_URL) {
+    throw new Error("AGENT_REPUTATION_ADDRESS or BASE_RPC_URL not set");
+  }
+
+  const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL);
+  const contract = new ethers.Contract(process.env.AGENT_REPUTATION_ADDRESS, REPUTATION_ABI, provider);
+  const info = await contract.getAgentInfo(agent);
+
+  const score = Number(info.score);
+  const totalActions = Number(info.totalActions);
+  const uniqueContracts = Number(info.uniqueContracts);
+  const firstActionAt = Number(info.firstActionAt);
+  const lastActionAt = Number(info.lastActionAt);
+
+  const now = Math.floor(Date.now() / 1000);
+  const recent = lastActionAt > 0 && (now - lastActionAt) <= TRUST_WINDOW_SECONDS;
+  const trustApproved = score >= MIN_SCORE && uniqueContracts >= MIN_UNIQUE_CONTRACTS && recent;
+
+  let trustStatus = "low_trust";
+  if (score >= MIN_SCORE && uniqueContracts >= MIN_UNIQUE_CONTRACTS && recent) {
+    trustStatus = "trusted";
+  } else if (score >= MIN_SCORE && uniqueContracts >= MIN_UNIQUE_CONTRACTS && !recent) {
+    trustStatus = "stale";
+  }
+
+  return {
+    score,
+    totalActions,
+    uniqueContracts,
+    firstActionAt,
+    lastActionAt,
+    recent,
+    trustApproved,
+    trustStatus,
+    minScore: MIN_SCORE,
+    minUniqueContracts: MIN_UNIQUE_CONTRACTS,
+    trustWindowSeconds: TRUST_WINDOW_SECONDS
+  };
+}
+
 function buildOnlyAgentTx({ promptHash, responseHash, timestamp, teeSignature }) {
   const calldata = iface.encodeFunctionData("prove", [
     promptHash,
@@ -145,24 +193,24 @@ async function main() {
   console.log("Mode:     ", ONLYAGENT_MODE);
   console.log("Prompt:   ", prompt);
 
-  console.log("\n[1/5] Calling Venice (e2ee TEE model)...");
+  console.log("\n[1/6] Calling Venice (e2ee TEE model)...");
   const { response, reasoning, requestId, teeConfirmed, teeProvider } = await callVenice(prompt);
   console.log("Request ID:   ", requestId);
   console.log("TEE confirmed:", teeConfirmed, teeProvider ? `(${teeProvider})` : "");
   console.log("Response:     ", response);
   if (reasoning) console.log("Reasoning:    ", reasoning.slice(0, 80) + "...");
 
-  console.log("\n[2/5] Fetching Venice TEE attestation...");
+  console.log("\n[2/6] Fetching Venice TEE attestation...");
   const attestation = await fetchAttestation();
   console.log("Signer:       ", attestation.signing_address);
   console.log("Hardware:     ", attestation.tee_hardware);
   console.log("Verified:     ", attestation.verified);
 
-  console.log("\n[3/5] Fetching Venice request signature...");
+  console.log("\n[3/6] Fetching Venice request signature...");
   const sigPayload = await fetchSignature(requestId);
   console.log("Signed text:  ", sigPayload.text);
 
-  console.log("\n[4/5] Verifying Venice signature...");
+  console.log("\n[4/6] Verifying Venice signature...");
   const recovered = ethers.verifyMessage(sigPayload.text, sigPayload.signature);
   if (recovered.toLowerCase() !== attestation.signing_address.toLowerCase()) {
     throw new Error(`Signer mismatch: recovered ${recovered}, attested ${attestation.signing_address}`);
@@ -175,12 +223,21 @@ async function main() {
   console.log("Prompt hash:  ", promptHash);
   console.log("Response hash:", responseHash);
 
+  console.log("\n[5/6] Checking ERC-8004-linked reputation trust...");
+  const trust = await getTrustInfo(agentAddress);
+  console.log("Trust status:        ", trust.trustStatus);
+  console.log("Trust approved:      ", trust.trustApproved);
+  console.log("Reputation score:    ", trust.score);
+  console.log("Unique contracts:    ", trust.uniqueContracts);
+  console.log("Last action at:      ", trust.lastActionAt);
+  console.log("Recent activity:     ", trust.recent);
+
   const responseTrimmed = response.trim();
   const responseUpper = responseTrimmed.toUpperCase();
   const decisionApproved = responseUpper === "YES";
   console.log("Decision approved:", decisionApproved);
 
-  console.log("\n[5/5] Building transaction payload...");
+  console.log("\n[6/6] Building transaction payload...");
   const timestamp = Math.floor(Date.now() / 1000);
   console.log("Timestamp:    ", timestamp);
 
@@ -190,6 +247,9 @@ async function main() {
   if (ONLYAGENT_MODE === "decision" && !decisionApproved) {
     submissionRecommendation = "do_not_submit";
     console.log("Decision mode denied: payload will not be built for submission.");
+  } else if (!trust.trustApproved) {
+    submissionRecommendation = "do_not_submit";
+    console.log("Trust policy denied: payload will not be built for submission.");
   } else {
     tx = buildOnlyAgentTx({
       promptHash,
@@ -218,7 +278,8 @@ async function main() {
       submissionRecommendation,
       promptHash,
       responseHash,
-      timestamp
+      timestamp,
+      trust
     },
     tx
   };
@@ -229,7 +290,7 @@ async function main() {
   writeRunLog(output);
 
   if (submissionRecommendation === "do_not_submit") {
-    console.log("\n👾 Venice TEE execution proof built. Decision denied at agent layer — do not submit.");
+    console.log("\n👾 Venice TEE execution proof built. Submission denied by decision/trust policy — do not submit.");
   } else {
     console.log("\n👾 Venice TEE execution proof built. Submit this payload with your harness wallet.");
   }

@@ -35,6 +35,10 @@
     .actions { color: #aaa; }
     .contracts-count { color: #aaa; }
     .last-active { color: #555; font-size: 0.78rem; }
+    .trust-badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 0.68rem; white-space: nowrap; }
+    .trust-trusted { background: #0f2416; color: #22c55e; border: 1px solid #1f5a33; }
+    .trust-stale { background: #2a210f; color: #f59e0b; border: 1px solid #6b4a14; }
+    .trust-low { background: #2a1212; color: #ef4444; border: 1px solid #6b1f1f; }
     .chain-badges { display: flex; gap: 0.3rem; flex-wrap: wrap; }
     .chain-badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 0.65rem; white-space: nowrap; }
     .badge-base { background: #0a1628; color: #2d6be4; border: 1px solid #1a3060; }
@@ -110,6 +114,22 @@
       return addr.slice(0, 6) + '...' + addr.slice(-4);
     }
 
+    function getTrustStatus(agent) {
+      const now = Math.floor(Date.now() / 1000);
+      const tenDays = 10 * 24 * 60 * 60;
+      const recent = agent.lastActionAt > 0 && (now - agent.lastActionAt) <= tenDays;
+      const hasRep = agent.score >= 1;
+      const hasBreadth = agent.uniqueContracts >= 1;
+
+      if (hasRep && hasBreadth && recent) {
+        return { label: 'Trusted', cls: 'trust-trusted' };
+      }
+      if (hasRep && hasBreadth && !recent) {
+        return { label: 'Stale', cls: 'trust-stale' };
+      }
+      return { label: 'Low Trust', cls: 'trust-low' };
+    }
+
     async function fetchChainAgents(chain) {
       try {
         const provider = new ethers.JsonRpcProvider(chain.rpc);
@@ -169,6 +189,7 @@
           const badges = agent.chains.map(c =>
             '<span class="chain-badge ' + c.badgeClass + '">' + c.name + '</span>'
           ).join('');
+          const trust = getTrustStatus(agent);
           return '<tr>' +
             '<td class="rank ' + (isTop ? 'top' : '') + '">' + rank + '</td>' +
             '<td><div class="agent">' +
@@ -178,6 +199,7 @@
             '<td class="score">' + agent.score + '</td>' +
             '<td class="actions">' + agent.totalActions + '</td>' +
             '<td class="contracts-count">' + agent.uniqueContracts + '</td>' +
+            '<td><span class="trust-badge ' + trust.cls + '">' + trust.label + '</span></td>' +
             '<td><div class="chain-badges">' + badges + '</div></td>' +
             '<td class="last-active">' + timeAgo(agent.lastActionAt) + '</td>' +
             '</tr>';
@@ -185,7 +207,7 @@
 
         document.getElementById('content').innerHTML =
           '<table><thead><tr>' +
-          '<th>#</th><th>Agent</th><th>Score</th><th>Actions</th><th>Contracts</th><th>Chains</th><th>Last Active</th>' +
+          '<th>#</th><th>Agent</th><th>Score</th><th>Actions</th><th>Contracts</th><th>Trust</th><th>Chains</th><th>Last Active</th>' +
           '</tr></thead><tbody>' + rows + '</tbody></table>';
 
         document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
