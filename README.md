@@ -149,7 +149,69 @@ If any trust condition fails, the runtime returns:
 
 and no transaction is submitted.
 
-### Why this matters
+### Private cognition → verifiable action (Venice alignment)
+
+OnlyAgent demonstrates a pattern where sensitive inputs remain private inside a Venice TEE, while the resulting action is provably tied to that execution onchain.
+
+### Example: treasury decision
+
+The agent evaluates a transfer using private financial state:
+
+- Treasury balance: $4.2M  
+- Monthly burn: $380k  
+- Proposed transfer: $1.5M  
+- Policy: maintain ≥ 6 months runway  
+
+These inputs are **never exposed onchain**.
+
+Inside the Venice enclave:
+- the model evaluates the policy against private inputs
+- produces a visible decision (`YES` or `NO`)
+- signs `promptHash:responseHash`
+
+Onchain:
+- OnlyAgent verifies the Venice TEE signature
+- verifies the agent identity (ERC-8004)
+- enforces freshness + replay protection
+
+At the agent layer:
+- `YES` → submit transaction  
+- `NO` → do not submit  
+
+### Key property
+
+This creates a new primitive:
+
+> **Private state → AI decision → verifiable execution**
+
+The chain proves:
+- the execution happened
+- the decision came from a TEE-backed model
+- the action was taken by a trusted agent
+
+But it never sees:
+- the private inputs
+- intermediate reasoning
+
+### Why this fits Venice
+
+Venice provides:
+- encrypted inference (`e2ee-*`)
+- attestation (Intel TDX)
+- per-request signatures
+
+OnlyAgent turns that into:
+- **decision-gated execution**
+- **trust-gated execution**
+- **verifiable actions from private context**
+
+This is strictly stronger than:
+- oracles (no privacy)
+- signatures (no execution provenance)
+- offchain agents (no verifiability)
+
+
+## Why this matters
 
 A valid TEE proof is **not enough**.  
 A visible `YES` decision is **not enough**.
