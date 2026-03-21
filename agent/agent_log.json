@@ -512,5 +512,152 @@
     "total_duration_ms": 0,
     "tool_calls": 6,
     "retries": 0
+  },
+  {
+    "task": "Attempt onchain decision binding via proveApproved() on Base Mainnet",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+    "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "run": 11,
+    "status": "failed",
+    "context": "Experimental onchain decision-gating path using proveApproved() and responseHash == keccak256('YES')",
+    "steps": [
+      {
+        "step": 1,
+        "action": "execute",
+        "description": "Called live Venice e2ee TEE model for decision-mode response",
+        "tool": "venice_api",
+        "model": "e2ee-qwen-2-5-7b-p",
+        "prompt": "Should I execute this safe transaction? This transfer is approved by policy. Respond YES or NO only.",
+        "request_id": "chatcmpl-0a056e65ac8a441598af34b9623111af",
+        "tee_confirmed": true,
+        "tee_provider": "phala",
+        "visible_response": "YES",
+        "result": "response_received"
+      },
+      {
+        "step": 2,
+        "action": "verify",
+        "description": "Fetched Venice TEE attestation and confirmed live signer identity",
+        "tool": "venice_attestation",
+        "signing_address": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+        "tee_hardware": "intel-tdx",
+        "verified": true,
+        "result": "attestation_verified"
+      },
+      {
+        "step": 3,
+        "action": "verify",
+        "description": "Fetched per-request Venice signature and compared provider-defined responseHash against local keccak256('YES')",
+        "tool": "venice_signature",
+        "signed_text": "2a4d6dfb963cb3ec4f76b6d69627d6b0714f8c43bbd01d43a223f8b9e10516ee:4cb5fa3b4128a0b013fbf5567e10d5a9eee7ef42a1bf56428dd943d0e16ea48c",
+        "prompt_hash": "0x2a4d6dfb963cb3ec4f76b6d69627d6b0714f8c43bbd01d43a223f8b9e10516ee",
+        "response_hash": "0x4cb5fa3b4128a0b013fbf5567e10d5a9eee7ef42a1bf56428dd943d0e16ea48c",
+        "visible_response_hash": "0x5950ebe73a617667a66f67d525282c827c82ef4d89ae8dcd8336d013773b6b7f",
+        "recovered_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+        "result": "signature_verified_but_hash_mismatch"
+      },
+      {
+        "step": 4,
+        "action": "test",
+        "description": "Repeated comparison with reasoning disabled; visible content remained YES but provider-defined responseHash still differed from keccak256('YES')",
+        "tool": "venice_api",
+        "request_id": "chatcmpl-d55ba836bf324b298e23223bcafa43a1",
+        "visible_response": "YES",
+        "response_hash": "0x0c13795ade5b0832d4004f23d0d8ed2b234b78bf43743af30af3e7edb4fbb052",
+        "visible_response_hash": "0x5950ebe73a617667a66f67d525282c827c82ef4d89ae8dcd8336d013773b6b7f",
+        "result": "provider_defined_hash_confirmed"
+      }
+    ],
+    "final_output": {
+      "experimental_contract": "0x2248bb37821f8675B4de7786c8C5d1E15333E869",
+      "conclusion": "Venice responseHash is provider-defined and not equal to keccak256(visible plaintext response), so direct onchain decision-string enforcement via proveApproved() is not valid under current signature semantics."
+    },
+    "tool_calls": 4,
+    "retries": 0
+  },
+  {
+    "task": "Run final OnlyAgent demo with execution proof onchain and agent-layer decision gating",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+    "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "run": 12,
+    "status": "success",
+    "context": "Final architecture: contract verifies Venice TEE execution via prove(); agent runtime reads visible plaintext response and decides submit vs do_not_submit",
+    "steps": [
+      {
+        "step": 1,
+        "action": "execute",
+        "description": "Execution-proof baseline in prove mode",
+        "tool": "openclaw_skill",
+        "mode": "prove",
+        "prompt": "Execute this onchain action. Execution proof baseline.",
+        "visible_response": "long explanatory text about onchain actions",
+        "prompt_hash": "0xb3d9c6bfb8bd5f30e4c425535c9d85505ebb537b2ad449bd8f1a37a21375d9ed",
+        "response_hash": "0xb1e77b2acb7f955fe0788aeb65cf8b153334449aa4e4b90ed26e8b4b510bce0b",
+        "log_file": "logs/run-1774058833.json",
+        "result": "payload_built"
+      },
+      {
+        "step": 2,
+        "action": "submit",
+        "description": "Submitted prove() baseline payload via harness wallet",
+        "tool": "harness_wallet",
+        "tx_hash": "0x27a3031e7306eb1d7e9f4f2f12a129693198f2fa944050e400c564f83403892d",
+        "block_number": 43634747,
+        "contract": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+        "result": "confirmed"
+      },
+      {
+        "step": 3,
+        "action": "execute",
+        "description": "Decision-mode approved case; visible response YES caused agent-layer approval and prove() submission",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "prompt": "Should I execute this transfer? The request is valid and approved by policy. Respond YES or NO only.",
+        "visible_response": "YES",
+        "decision_approved": true,
+        "submission_recommendation": "submit",
+        "prompt_hash": "0xc4f14f669db0286b818989a09094ba5fd27ad7f03661e621094cae5cb4b6c9c0",
+        "response_hash": "0x6d4f0922dc08655cb3a5c6625c3bd24d7e5b1d54bd186fd7623cc962f6a44a35",
+        "log_file": "logs/run-1774058847.json",
+        "result": "payload_built"
+      },
+      {
+        "step": 4,
+        "action": "submit",
+        "description": "Submitted approved decision payload via harness wallet using prove() on the v1 contract",
+        "tool": "harness_wallet",
+        "tx_hash": "0x2d9053d7e838a2561fa8f62f1d3f44e76468f4c2e9393e57bc01b2e5398d7b8b",
+        "block_number": 43634754,
+        "contract": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+        "result": "confirmed"
+      },
+      {
+        "step": 5,
+        "action": "execute",
+        "description": "Decision-mode denied case; visible response NO caused agent-layer do_not_submit and no transaction was sent",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "prompt": "Should I execute this transfer? The recipient address looks suspicious. Respond YES or NO only.",
+        "visible_response": "NO",
+        "decision_approved": false,
+        "submission_recommendation": "do_not_submit",
+        "prompt_hash": "0x676fc8d580bcad274e823cead8cb1fcf9ad280eac808654299105ade60b8c912",
+        "response_hash": "0xf57263aac5cc0d070598e8678f7b4a3055af55ca759953d7975d77563dd5e3b4",
+        "log_file": "logs/run-1774058867.json",
+        "result": "correctly_denied_without_submission"
+      }
+    ],
+    "final_output": {
+      "baseline_tx_hash": "0x27a3031e7306eb1d7e9f4f2f12a129693198f2fa944050e400c564f83403892d",
+      "approved_decision_tx_hash": "0x2d9053d7e838a2561fa8f62f1d3f44e76468f4c2e9393e57bc01b2e5398d7b8b",
+      "denied_decision_submission": "do_not_submit",
+      "contract": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+      "reputation_contract": "0xB5e35148d21C630faafB10eBF20AE455635B3aE1",
+      "venice_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c"
+    },
+    "tool_calls": 5,
+    "retries": 0
   }
 ]

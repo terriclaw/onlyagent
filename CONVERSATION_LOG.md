@@ -440,3 +440,122 @@ This established the final demo architecture for OnlyAgent:
 
 At this point, the demo is no longer tied to a single wallet implementation. OnlyAgent generates a proof payload; the agent harness supplies the submitting wallet.
 
+
+---
+
+## Session 10 — Onchain Decision-Binding Attempt, Venice Hash Semantics Discovery, and Final Agent-Layer Decision Gating
+
+**Initial goal:**
+Strengthen OnlyAgent beyond execution provenance by enforcing a semantic AI decision onchain. The attempted design added `proveApproved()` to `OnlyAgent.sol`, intending to require that the TEE-backed response was exactly `YES`.
+
+**Experimental contract path:**
+A new Base Mainnet `OnlyAgent` contract was deployed at:
+- `0x2248bb37821f8675B4de7786c8C5d1E15333E869`
+
+This version added:
+- `YES_HASH = keccak256("YES")`
+- `proveApproved()`
+- onchain check: `responseHash == YES_HASH`
+
+The goal was:
+- Venice says `YES`
+- the contract enforces that approval directly onchain
+
+**What was tested:**
+Multiple decision-mode runs were executed using `e2ee-qwen-2-5-7b-p` with prompts instructing the model to answer exactly `YES` or `NO`.
+
+Observed results:
+- visible plaintext response could be exactly `YES`
+- local `keccak256("YES")` matched the expected hash
+- but Venice `/tee/signature` returned a different `responseHash`
+- `proveApproved()` reverted with `OnlyAgent: decision denied`
+
+**Critical investigation:**
+The raw Venice API surfaces were tested directly:
+1. `/chat/completions`
+2. `/tee/attestation`
+3. `/tee/signature`
+
+This confirmed:
+- `choices[0].message.content` could be `"YES"`
+- `reasoning_content` could be `null`
+- reasoning could be explicitly disabled
+- yet `responseHash` from `/tee/signature` still did **not** equal `keccak256(message.content)`
+
+Venice's signature endpoint itself states:
+
+> treat request/response hashes as provider-reported values unless you can independently recompute them from a documented canonical format.
+
+**Conclusion:**
+This was not a bug in OnlyAgent. It was a provider semantics boundary.
+
+Venice provides:
+- verifiable execution provenance
+- signer authenticity
+- attested TEE execution
+
+But Venice does **not** currently expose a documented canonical mapping from visible plaintext response → `responseHash`.
+
+That means:
+- direct onchain enforcement of a visible response string like `YES`
+- using `responseHash == keccak256("YES")`
+
+is not valid under current Venice signature semantics.
+
+**Architectural decision:**
+The project was deliberately reverted back to the live v1 Base contract:
+- OnlyAgent: `0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D`
+
+`OnlyAgent.sol` was restored to a single execution-proof entrypoint:
+- `prove()`
+
+The stronger design was preserved by moving semantic enforcement to the agent runtime rather than the contract.
+
+**Final architecture after the revert:**
+- **Contract layer** — verifies Venice TEE execution provenance onchain via `prove()`
+- **Agent layer** — reads the visible plaintext response and applies deterministic policy
+- **Harness wallet** — submits only if the agent says `submit`
+
+So the system now cleanly separates:
+- cryptographic proof of execution (onchain)
+- policy interpretation of visible output (agent layer)
+
+**Final demo run — all three cases succeeded under the new architecture:**
+
+### Case 1 — Execution Proof baseline
+- mode: `prove`
+- prompt: `Execute this onchain action. Execution proof baseline.`
+- result: payload built and submitted
+- Base TX: `0x27a3031e7306eb1d7e9f4f2f12a129693198f2fa944050e400c564f83403892d`
+- block: `43634747`
+
+### Case 2 — Decision mode approved
+- mode: `decision`
+- prompt: `Should I execute this transfer? The request is valid and approved by policy. Respond YES or NO only.`
+- visible response: `YES`
+- agent-layer decision: `submit`
+- payload built against `prove()`
+- Base TX: `0x2d9053d7e838a2561fa8f62f1d3f44e76468f4c2e9393e57bc01b2e5398d7b8b`
+- block: `43634754`
+
+### Case 3 — Decision mode denied
+- mode: `decision`
+- prompt: `Should I execute this transfer? The recipient address looks suspicious. Respond YES or NO only.`
+- visible response: `NO`
+- agent-layer decision: `do_not_submit`
+- no transaction was submitted
+- run correctly terminated at the agent layer
+
+**Log artifacts:**
+- `logs/run-1774058833.json` — execution-proof baseline
+- `logs/run-1774058847.json` — decision approved and submitted
+- `logs/run-1774058867.json` — decision denied with no submission
+
+**Resulting model:**
+OnlyAgent now has a stable and honest architecture:
+
+- Venice TEE proves that a model execution occurred
+- the contract proves that execution provenance onchain
+- the agent uses the visible plaintext response to decide whether to submit
+
+This is a real level-up from execution-only v1, while staying aligned with the actual semantics exposed by the Venice API.
