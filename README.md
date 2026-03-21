@@ -273,7 +273,7 @@ OnlyAgent produces real, inspectable transactions on Base:
 ### What makes this an ERC-8004 project
 
 OnlyAgent does not just register an agent identity.  
-It uses ERC-8004 trust signals to control whether an agent is allowed to act.
+It uses ERC-8004 identity as the anchor, with OnlyAgent enforcing trust via its own onchain reputation system.
 
 In the final demo:
 
