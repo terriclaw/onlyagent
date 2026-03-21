@@ -164,6 +164,7 @@ For all cases:
 - do not add extra cases
 - rerun a case if the expected YES or NO is not produced
 
+
 ## Expected result
 
 You must report:
