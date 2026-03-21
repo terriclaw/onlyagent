@@ -331,6 +331,8 @@ This demonstrates both:
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
 - 🔗 [Execution Proof TX](https://basescan.org/tx/0x27a3031e7306eb1d7e9f4f2f12a129693198f2fa944050e400c564f83403892d) — final baseline prove() demo on Base Mainnet
 - 🔗 [Decision YES TX](https://basescan.org/tx/0x2d9053d7e838a2561fa8f62f1d3f44e76468f4c2e9393e57bc01b2e5398d7b8b) — final decision-approved demo on Base Mainnet
+- 🔗 Trust Fail Case — decision YES but execution blocked due to low ERC-8004 reputation (no transaction submitted; see logs/session 11)
+- 📄 Logs — full 4-case demo including trust pass + trust fail (`logs/`)
 
 ---
 
