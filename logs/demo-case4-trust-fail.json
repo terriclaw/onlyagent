@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "agentAddress": "0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1",
+    "model": "e2ee-qwen-2-5-7b-p",
+    "mode": "decision",
+    "requestId": "chatcmpl-6154a530201a444aa5fd312843f7bece",
+    "teeConfirmed": true,
+    "teeProvider": "phala",
+    "teeSigner": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+    "teeHardware": "intel-tdx",
+    "attestationVerified": true,
+    "prompt": "Should I execute this transaction? The request is valid and meets all policy criteria. Respond YES or NO only.",
+    "response": "YES",
+    "responseTrimmed": "YES",
+    "responseUpper": "YES",
+    "decisionApproved": true,
+    "submissionRecommendation": "do_not_submit",
+    "promptHash": "0xa61313477340bf7e3939f9ab7156f9e70d5bdf7d690092e933e79c30932d1e29",
+    "responseHash": "0xd8a8c459d0ceb297002afe2256aeb4b705f4d0ba1e5e50cbcd6f2cc89d4f1424",
+    "timestamp": 1774078376,
+    "trust": {
+      "score": 0,
+      "totalActions": 0,
+      "uniqueContracts": 0,
+      "firstActionAt": 0,
+      "lastActionAt": 0,
+      "recent": false,
+      "trustApproved": false,
+      "trustStatus": "low_trust",
+      "minScore": 1,
+      "minUniqueContracts": 1,
+      "trustWindowSeconds": 864000
+    }
+  },
+  "tx": null
+}

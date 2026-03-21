@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "agentAddress": "0x0457b3ded2ba9e56520b21735f4324f6533f93ff",
+    "model": "e2ee-qwen-2-5-7b-p",
+    "mode": "decision",
+    "requestId": "chatcmpl-f8f965b08abe4466ab927fb66e073c8f",
+    "teeConfirmed": true,
+    "teeProvider": "phala",
+    "teeSigner": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+    "teeHardware": "intel-tdx",
+    "attestationVerified": true,
+    "prompt": "Should I execute this transaction? The request is valid and meets all policy criteria. Respond YES or NO only.",
+    "response": "YES",
+    "responseTrimmed": "YES",
+    "responseUpper": "YES",
+    "decisionApproved": true,
+    "submissionRecommendation": "submit",
+    "promptHash": "0xa61313477340bf7e3939f9ab7156f9e70d5bdf7d690092e933e79c30932d1e29",
+    "responseHash": "0xa877b32f12bdf07ef312e3eb29eb35f6ea43e43bdbec6358811cd6727a7f3e0e",
+    "timestamp": 1774078359,
+    "trust": {
+      "score": 10,
+      "totalActions": 10,
+      "uniqueContracts": 2,
+      "firstActionAt": 1773898903,
+      "lastActionAt": 1774078341,
+      "recent": true,
+      "trustApproved": true,
+      "trustStatus": "trusted",
+      "minScore": 1,
+      "minUniqueContracts": 1,
+      "trustWindowSeconds": 864000
+    }
+  },
+  "tx": {
+    "to": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+    "data": "0x21e000aca61313477340bf7e3939f9ab7156f9e70d5bdf7d690092e933e79c30932d1e29a877b32f12bdf07ef312e3eb29eb35f6ea43e43bdbec6358811cd6727a7f3e0e0000000000000000000000000000000000000000000000000000000069be4997000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000416bd138615aee9185f814aada1f9bd1ee93c0acdb33f669cf586f46c49ba5abe92f35ad173c9fa16773645d13f0c1b6defd445951e3079f0051cfeae1c5efe84a1c00000000000000000000000000000000000000000000000000000000000000",
+    "value": "0",
+    "chainId": 8453
+  }
+}
