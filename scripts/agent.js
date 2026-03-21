@@ -211,6 +211,22 @@ async function main() {
     teeSignature: sigPayload.signature
   });
 
+  const responseTrimmed = response.trim();
+  const responseUpper = responseTrimmed.toUpperCase();
+  const responseExactHash = ethers.keccak256(ethers.toUtf8Bytes(response));
+  const responseTrimmedHash = ethers.keccak256(ethers.toUtf8Bytes(responseTrimmed));
+  const responseUpperHash = ethers.keccak256(ethers.toUtf8Bytes(responseUpper));
+  const expectedYesHash = ethers.keccak256(ethers.toUtf8Bytes("YES"));
+
+  console.log("Response raw:        ", JSON.stringify(response));
+  console.log("Response trimmed:    ", JSON.stringify(responseTrimmed));
+  console.log("Response upper:      ", JSON.stringify(responseUpper));
+  console.log("Response length:     ", response.length);
+  console.log("Response exact hash: ", responseExactHash);
+  console.log("Response trim hash:  ", responseTrimmedHash);
+  console.log("Response upper hash: ", responseUpperHash);
+  console.log("Expected YES hash:   ", expectedYesHash);
+
   const output = {
     meta: {
       agentAddress,
@@ -222,6 +238,14 @@ async function main() {
       teeHardware: attestation.tee_hardware,
       attestationVerified: attestation.verified,
       prompt,
+      response,
+      responseTrimmed,
+      responseUpper,
+      responseLength: response.length,
+      responseExactHash,
+      responseTrimmedHash,
+      responseUpperHash,
+      expectedYesHash,
       promptHash,
       responseHash,
       timestamp
