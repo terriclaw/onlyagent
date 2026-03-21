@@ -62,7 +62,7 @@ No proof, no access.
 
 Venice's enclave signs `personal_sign(promptHash:responseHash)` — proving a specific model execution occurred.
 
-The contract reconstructs `promptHash:responseHash`, verifies the signature using Ethereum `personal_sign` semantics and recovers the signer, and checks that the recovered signer matches a trusted TEE provider.
+The contract receives `promptHash:responseHash`, verifies the signature using Ethereum `personal_sign` semantics, recovers the signer, and checks that the recovered signer matches a trusted TEE provider.
 
 The contract enforces execution context separately:
 - `msg.sender` must be an ERC-8004 registered agent
@@ -154,6 +154,18 @@ This allows protocols to accept actions derived from private inference while mai
 OnlyAgent currently proves Venice TEE execution onchain. Agent-layer decision gating is implemented by inspecting the visible plaintext response and only submitting `prove()` when a deterministic policy passes.
 
 Direct onchain enforcement of specific visible response strings is currently blocked by provider-defined `responseHash` semantics from Venice's signature endpoint.
+
+### Verifiable semantics (future work)
+
+Today, decision gating happens at the agent layer because Venice defines `responseHash` in a provider-specific way.
+
+A fully trustless design would require:
+- canonical response encoding
+- publicly recomputable response hashes
+- or zk/TEE proofs over the visible plaintext
+
+OnlyAgent exposes this gap clearly: execution can be proven onchain, but semantic correctness of outputs remains an open problem.
+
 
 ---
 
