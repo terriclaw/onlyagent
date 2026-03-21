@@ -1,3 +1,13 @@
+
+const fs = require("fs");
+
+function writeRunLog(data) {
+  const ts = Math.floor(Date.now() / 1000);
+  const path = `logs/run-${ts}.json`;
+  fs.writeFileSync(path, JSON.stringify(data, null, 2));
+  console.log("Log saved:", path);
+}
+
 import { ethers } from "ethers";
 import "dotenv/config";
 
