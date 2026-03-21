@@ -1,8 +1,10 @@
 # OnlyAgent
 
-A smart contract primitive for **verifiable AI execution onchain with agent-layer decision gating**.
+A permission layer for **verifiable private AI agents onchain** — bridging Venice private cognition to trusted public actions.
 
 `onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider that exposes Ethereum-verifiable ECDSA signatures. The current Base Mainnet demo verifies signatures from Venice AI's live TEE signer directly onchain, while the agent runtime applies deterministic policy to the visible plaintext response before submission.
+
+OnlyAgent turns AI inference into a **first-class onchain requirement**: contracts can require proof that a private Venice TEE execution occurred before allowing state changes.
 
 ---
 
@@ -18,6 +20,8 @@ OnlyAgent wires **Venice private cognition to trustworthy onchain action**.
 This directly implements the Venice track requirement: connecting private inference to public systems where actions must be verifiable.
 
 OnlyAgent does not interpret model outputs or reasoning onchain. It enforces that a Venice-backed execution occurred before an onchain action is permitted. The agent runtime can then apply deterministic decision policy to the visible plaintext response before deciding whether to submit the onchain action.
+
+OnlyAgent defines the missing primitive: **execution-verifiable AI agents** that can act on public systems without exposing their reasoning.
 
 **Example use case: Private treasury agent**
 
@@ -37,8 +41,8 @@ OnlyAgent now has a clean separation of concerns:
 - **Harness wallet** — submits only when the agent says `submit`
 
 This means:
-- the contract proves that trusted AI execution occurred
-- the agent decides whether that visible output justifies acting
+- the contract proves **execution truth**
+- the agent enforces **decision truth**
 
 This is the final architecture used in the current Base Mainnet demo.
 
@@ -160,6 +164,8 @@ OnlyAgent exposes this gap clearly: execution can be proven onchain, but semanti
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
 
 ---
+
+This repo demonstrates the full loop: private cognition → verifiable execution → gated onchain action.
 
 ## Demo Cases
 
