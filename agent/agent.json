@@ -17,7 +17,7 @@
     "onchain_verification",
     "agent_reputation",
     "tee_execution_proof",
-    "wallet_agnostic_payload_generation",
+    "agent_layer_decision_gating",
     "contract_execution",
     "tee_signature_verification"
   ],
