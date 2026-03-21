@@ -559,3 +559,91 @@ OnlyAgent now has a stable and honest architecture:
 - the agent uses the visible plaintext response to decide whether to submit
 
 This is a real level-up from execution-only v1, while staying aligned with the actual semantics exposed by the Venice API.
+
+---
+
+## Session 11 — Canonical 4-Case Demo with ERC-8004 Trust-Gated Execution
+
+**Final architecture extension:**
+After establishing the stable Venice execution-proof + agent-layer decision architecture in Session 10, the system was extended with a third gate: ERC-8004-linked trust policy.
+
+This created three independent layers:
+
+- **Identity** — the acting wallet must be ERC-8004 registered
+- **Execution** — Venice TEE execution must be verified onchain
+- **Trust** — the acting agent identity must have sufficient onchain reputation history
+
+**Trust policy implemented:**
+The agent runtime now evaluates `AgentReputation` before submission using:
+
+- `score >= 1`
+- `uniqueContracts >= 1`
+- `lastActionAt` within 10 days
+
+This policy is computed from real onchain reputation state and surfaced both:
+- in the agent runtime
+- on the leaderboard as a trust classification
+
+**Why this matters:**
+This changed OnlyAgent from an execution-verification primitive into a trust-gated execution system.
+
+A valid TEE proof is no longer sufficient by itself.  
+A visible `YES` decision is no longer sufficient by itself.  
+The acting identity must also be trusted.
+
+**Canonical 4-case demo completed successfully:**
+
+### Case 1 — Execution Proof baseline
+- trusted agent: `0x0457B3DED2BA9E56520B21735f4324F6533F93ff`
+- mode: `prove`
+- result: submitted and confirmed
+- Base TX: `0xc8ab0440ba0e064e588621fdec780cb2823b8666310cdc240da0cdd963b40f46`
+- block: `43644497`
+
+### Case 2 — Decision denied
+- trusted agent: `0x0457B3DED2BA9E56520B21735f4324F6533F93ff`
+- mode: `decision`
+- visible response: `NO`
+- result: `do_not_submit`
+- no transaction submitted
+
+### Case 3 — Decision approved + trust pass
+- trusted agent: `0x0457B3DED2BA9E56520B21735f4324F6533F93ff`
+- mode: `decision`
+- visible response: `YES`
+- trust status: `trusted`
+- result: submitted and confirmed
+- Base TX: `0x8234019d5a4506a6a53bc32c46d6088936542b127aaa7f9e127a8484d77d3dcc`
+- block: `43644510`
+
+### Case 4 — Decision approved + trust fail
+- registered but untrusted agent: `0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1`
+- mode: `decision`
+- visible response: `YES`
+- trust score: `0`
+- trust status: `low_trust`
+- result: `do_not_submit`
+- no transaction submitted
+
+**Critical result:**
+Case 4 proved the full trust system works as intended.
+
+The agent identity was ERC-8004 registered.  
+The Venice execution was valid.  
+The model decision was `YES`.  
+But the action was still blocked because the acting identity lacked sufficient reputation history.
+
+This is the strongest current expression of the OnlyAgent design:
+
+- private cognition via Venice
+- execution provenance verified onchain
+- deterministic decision policy at the agent layer
+- trust-gated submission using ERC-8004-linked reputation
+
+**Canonical log artifacts (Session 11):**
+- `logs/demo-case1-execution.json`
+- `logs/demo-case2-decision-deny.json`
+- `logs/demo-case3-trust-pass.json`
+- `logs/demo-case4-trust-fail.json`
+
+These files are the canonical raw receipts for hackathon submission.

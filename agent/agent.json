@@ -19,7 +19,9 @@
     "tee_execution_proof",
     "agent_layer_decision_gating",
     "contract_execution",
-    "tee_signature_verification"
+    "tee_signature_verification",
+    "erc8004_trust_gating",
+    "trust_gated_execution"
   ],
   "tech_stack": [
     "Node.js",

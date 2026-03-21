@@ -659,5 +659,104 @@
     },
     "tool_calls": 5,
     "retries": 0
+  },
+  {
+    "task": "Run canonical OnlyAgent 4-case demo with execution, decision, and ERC-8004 trust gating on Base Mainnet",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+    "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "run": 13,
+    "status": "success",
+    "context": "Canonical Session 11 demo showing four independent outcomes: execution proof, decision denial, decision approval with trust pass, and decision approval with trust fail",
+    "steps": [
+      {
+        "step": 1,
+        "action": "execute",
+        "description": "Execution-proof baseline completed with trusted TerriClaw identity",
+        "tool": "openclaw_skill",
+        "mode": "prove",
+        "agent_identity": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+        "trust_status": "trusted",
+        "log_file": "logs/demo-case1-execution.json",
+        "result": "payload_built_and_submitted"
+      },
+      {
+        "step": 2,
+        "action": "verify",
+        "description": "Confirmed baseline execution proof onchain",
+        "tool": "base_rpc",
+        "tx_hash": "0xc8ab0440ba0e064e588621fdec780cb2823b8666310cdc240da0cdd963b40f46",
+        "basescan": "https://basescan.org/tx/0xc8ab0440ba0e064e588621fdec780cb2823b8666310cdc240da0cdd963b40f46",
+        "block_number": 43644497,
+        "result": "confirmed"
+      },
+      {
+        "step": 3,
+        "action": "execute",
+        "description": "Decision-denied case completed: visible response NO caused do_not_submit with trusted identity",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "agent_identity": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+        "visible_response": "NO",
+        "decision_approved": false,
+        "trust_status": "trusted",
+        "submission_recommendation": "do_not_submit",
+        "log_file": "logs/demo-case2-decision-deny.json",
+        "result": "correctly_denied_without_submission"
+      },
+      {
+        "step": 4,
+        "action": "execute",
+        "description": "Decision-approved trusted case completed: visible response YES and trusted reputation caused submission",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "agent_identity": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+        "visible_response": "YES",
+        "decision_approved": true,
+        "trust_status": "trusted",
+        "submission_recommendation": "submit",
+        "log_file": "logs/demo-case3-trust-pass.json",
+        "result": "payload_built_and_submitted"
+      },
+      {
+        "step": 5,
+        "action": "verify",
+        "description": "Confirmed trusted decision-approved execution onchain",
+        "tool": "base_rpc",
+        "tx_hash": "0x8234019d5a4506a6a53bc32c46d6088936542b127aaa7f9e127a8484d77d3dcc",
+        "basescan": "https://basescan.org/tx/0x8234019d5a4506a6a53bc32c46d6088936542b127aaa7f9e127a8484d77d3dcc",
+        "block_number": 43644510,
+        "result": "confirmed"
+      },
+      {
+        "step": 6,
+        "action": "execute",
+        "description": "Decision-approved but trust-failed case completed using registered deployer wallet with zero reputation history",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "agent_identity": "0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1",
+        "visible_response": "YES",
+        "decision_approved": true,
+        "trust_status": "low_trust",
+        "trust_score": 0,
+        "submission_recommendation": "do_not_submit",
+        "log_file": "logs/demo-case4-trust-fail.json",
+        "result": "blocked_by_trust_policy_without_submission"
+      }
+    ],
+    "final_output": {
+      "execution_proof_tx_hash": "0xc8ab0440ba0e064e588621fdec780cb2823b8666310cdc240da0cdd963b40f46",
+      "decision_deny_submission": "do_not_submit",
+      "trusted_agent_tx_hash": "0x8234019d5a4506a6a53bc32c46d6088936542b127aaa7f9e127a8484d77d3dcc",
+      "trust_fail_submission": "do_not_submit",
+      "trusted_agent": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+      "untrusted_agent": "0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1",
+      "contract": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+      "reputation_contract": "0xB5e35148d21C630faafB10eBF20AE455635B3aE1",
+      "venice_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c"
+    },
+    "total_duration_ms": 0,
+    "tool_calls": 6,
+    "retries": 0
   }
 ]
