@@ -4,18 +4,11 @@ pragma solidity ^0.8.20;
 import "./AgentGated.sol";
 
 contract OnlyAgent is AgentGated {
-    bytes32 public constant YES_HASH = keccak256(bytes("YES"));
 
     event RealAgentProved(
         address indexed agent,
         uint256 newScore,
         uint256 uniqueContracts,
-        uint256 timestamp
-    );
-
-    event AgentDecisionApproved(
-        address indexed agent,
-        bytes32 indexed responseHash,
         uint256 timestamp
     );
 
@@ -51,41 +44,5 @@ contract OnlyAgent is AgentGated {
         );
 
         return "onlyAgent:verified";
-    }
-
-    function proveApproved(
-        bytes32 promptHash,
-        bytes32 responseHash,
-        uint256 timestamp,
-        bytes memory teeSignature
-    )
-        external
-        onlyAgent(promptHash, responseHash, timestamp, teeSignature)
-        returns (string memory)
-    {
-        require(responseHash == YES_HASH, "OnlyAgent: decision denied");
-
-        (
-            uint256 score,
-            ,
-            uint256 uniqueContracts,
-            ,
-
-        ) = reputation.getAgentInfo(msg.sender);
-
-        emit RealAgentProved(
-            msg.sender,
-            score,
-            uniqueContracts,
-            block.timestamp
-        );
-
-        emit AgentDecisionApproved(
-            msg.sender,
-            responseHash,
-            block.timestamp
-        );
-
-        return "onlyAgent:approved";
     }
 }
