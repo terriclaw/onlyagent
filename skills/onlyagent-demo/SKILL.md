@@ -52,7 +52,7 @@ cd ~/onlyagent && ONLYAGENT_MODE=decision AGENT_ADDRESS=<agent-address> node scr
 
 Immediate submission is required only when the script returns a non-null `tx` payload.
 
-If decision mode returns `submissionRecommendation = do_not_submit`, do not submit a transaction.
+If decision mode returns `submissionRecommendation = do_not_submit`, skip submission and report the denied outcome.
 
 ---
 
