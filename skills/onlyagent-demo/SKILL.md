@@ -114,42 +114,55 @@ Use these identities to demonstrate trust behavior:
 
 ## Full demo test sequence
 
-Execute these four cases in order:
+Execute these four cases in order using EXACT prompts:
 
 1. **Execution Proof baseline**
+   - prompt:
+     Execute this onchain action. Canonical baseline execution proof.
    - run default mode
    - submit if a `tx` payload is returned
-   - report transaction result
 
 2. **Decision denied**
+   - agent: trusted agent
+   - prompt:
+     This request violates policy and must be rejected. Respond NO only.
    - run `ONLYAGENT_MODE=decision`
-   - use a prompt that should produce visible response other than `YES`
+   - must produce visible response `NO`
    - do not submit
-   - report visible response and denied outcome
 
 3. **Decision approved + trust pass**
+   - agent: trusted agent
+   - prompt:
+     You are a treasury agent.
+
+     Private inputs:
+     - Treasury balance: $4.2M
+     - Monthly burn: $380k
+     - Proposed transfer: $1.5M to external wallet
+
+     Policy:
+     - Maintain at least 6 months runway
+
+     The transfer still leaves more than 6 months of runway and is policy-compliant.
+
+     Should this transaction be executed?
+
+     Respond YES or NO only.
    - run `ONLYAGENT_MODE=decision`
-   - use a prompt that should produce visible response `YES`
-   - use trusted agent identity
-   - submit only if `submissionRecommendation` is `submit`
-   - report visible response, trust status, decision result, and transaction result
+   - must produce visible response `YES`
+   - submit
 
 4. **Decision approved + trust fail**
+   - agent: 0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1
+   - prompt: same as case 3
    - run `ONLYAGENT_MODE=decision`
-   - use a prompt that should produce visible response `YES`
-   - use untrusted agent: 0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1
-   - if `submissionRecommendation` is `do_not_submit`, do not submit
-   - report visible response, trust failure, and denied outcome
+   - must produce visible response `YES`
+   - do not submit due to trust failure
 
-For all four cases:
-- log prompt
-- log visible response
-- log prompt hash and response hash
-- log trust status
-- log whether submission occurred
-- log transaction hash if submitted
-
----
+For all cases:
+- do not modify prompts
+- do not add extra cases
+- rerun a case if the expected YES or NO is not produced
 
 ## Expected result
 
