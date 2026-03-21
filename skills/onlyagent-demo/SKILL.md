@@ -1,6 +1,6 @@
 ---
 name: onlyagent-demo
-description: Use to prove Venice TEE execution onchain and enforce AI decision-gated execution at the agent layer via OnlyAgent. The agent performs private inference, verifies the Venice TEE signature, builds a transaction payload, and submits it using the harness wallet on Base.
+description: Use to prove Venice TEE execution onchain and enforce AI decision-gated and trust-gated execution at the agent layer via OnlyAgent using ERC-8004 reputation.
 metadata: {"openclaw": {"emoji": "🤖"}}
 ---
 
@@ -24,7 +24,8 @@ This skill supports two modes:
 ### 2. Decision-Gated Execution (`decision`)
 - Requires the visible model output to be exactly `YES`
 - Enforces AI authorization at the agent layer
-- Submits `prove()` onchain only when the visible decision is approved
+- Enforces trust-gated execution using ERC-8004-linked reputation
+- Submits `prove()` onchain only when both decision and trust checks pass
 
 ---
 
@@ -34,9 +35,10 @@ This skill supports two modes:
 - Fetches attestation and per-request signature
 - Verifies `personal_sign(promptHash:responseHash)`
 - Logs the visible plaintext response and decision outcome
+- Evaluates ERC-8004-linked reputation (score, recency, contract diversity)
 - Builds a transaction payload for OnlyAgent on Base
 - The harness submits the payload using its own wallet
-- Only succeeds if all onchain checks pass
+- Only succeeds if all onchain and agent-layer checks pass
 
 ---
 
@@ -52,11 +54,11 @@ cd ~/onlyagent && ONLYAGENT_MODE=decision AGENT_ADDRESS=<agent-address> node scr
 
 Immediate submission is required only when the script returns a non-null `tx` payload.
 
-If decision mode returns `submissionRecommendation = do_not_submit`, skip submission and report the denied outcome.
+If `submissionRecommendation = do_not_submit`, skip submission and report the denied outcome.
 
 ---
 
-## Decision policy (decision mode)
+## Decision policy
 
 The agent must evaluate a policy and respond with exactly:
 
@@ -70,40 +72,67 @@ Constraints:
 - No explanation
 - Uppercase only
 
-Agent-layer enforcement:
-- visible response `YES` → submit `prove()`
-- any other visible response → do not submit
+Decision enforcement:
+- visible response `YES` → decision passes
+- any other visible response → decision fails
 
-Onchain enforcement:
-- the contract still verifies Venice TEE execution provenance via `prove()`
+---
+
+## Trust policy (ERC-8004)
+
+Before submitting any transaction, the agent must evaluate the trustworthiness of the agent identity using ERC-8004-linked reputation.
+
+Trust conditions:
+- score ≥ 1
+- uniqueContracts ≥ 1
+- lastActionAt within 10 days
+
+Trust enforcement:
+- trust conditions met → trust passes
+- trust conditions not met → trust fails
+
+Submission rule:
+- decision = YES AND trust = valid → submit
+- decision = NO → do not submit
+- trust = invalid → do not submit
 
 ---
 
 ## Full demo test sequence
 
-For a full demo run, execute these three cases in order:
+Execute these four cases in order:
 
 1. **Execution Proof baseline**
    - run default mode
    - submit if a `tx` payload is returned
    - report transaction result
 
-2. **Decision mode — approved case**
-   - run `ONLYAGENT_MODE=decision`
-   - use a prompt that should produce visible response `YES`
-   - submit only if `submissionRecommendation` is `submit`
-   - report visible response, decision result, and transaction result
-
-3. **Decision mode — denied case**
+2. **Decision denied**
    - run `ONLYAGENT_MODE=decision`
    - use a prompt that should produce visible response other than `YES`
-   - if `submissionRecommendation` is `do_not_submit`, do not submit
+   - trust is not the reason for denial
+   - do not submit
    - report visible response and denied outcome
 
-For all three cases:
+3. **Decision approved + trust pass**
+   - run `ONLYAGENT_MODE=decision`
+   - use a prompt that should produce visible response `YES`
+   - use an agent identity that satisfies trust policy
+   - submit only if `submissionRecommendation` is `submit`
+   - report visible response, trust status, decision result, and transaction result
+
+4. **Decision approved + trust fail**
+   - run `ONLYAGENT_MODE=decision`
+   - use a prompt that should produce visible response `YES`
+   - use an agent identity with low or stale reputation
+   - if `submissionRecommendation` is `do_not_submit`, do not submit
+   - report visible response, trust failure, and denied outcome
+
+For all four cases:
 - log prompt
 - log visible response
 - log prompt hash and response hash
+- log trust status
 - log whether submission occurred
 - log transaction hash if submitted
 
@@ -117,6 +146,8 @@ You must report:
 - Prompt hash and response hash
 - Visible response text
 - Whether the decision was approved at the agent layer
+- Trust status (`trusted`, `stale`, or `low_trust`)
+- Whether trust policy passed
 - Transaction hash (BaseScan link) if submitted
 
 ---
@@ -134,13 +165,15 @@ You must report:
 
 ## Why this matters
 
-OnlyAgent enforces that an onchain action was backed by a Venice TEE execution.
-
-In decision mode, the agent additionally enforces a deterministic visible-output policy before submission.
+OnlyAgent enforces that an onchain action:
+- was backed by a Venice TEE execution
+- was explicitly approved by the agent
+- originates from a trusted agent identity with recent verifiable history
 
 This creates:
 - execution provenance onchain
 - decision gating at the agent layer
+- trust-gated execution using ERC-8004-linked reputation
 
 ---
 
@@ -150,4 +183,8 @@ Venice provides **private cognition**.
 
 OnlyAgent proves that cognition occurred onchain.
 
-The agent can then apply a deterministic policy to the visible plaintext response before deciding whether to submit the onchain action.
+The agent then applies:
+- a deterministic decision policy to the visible plaintext response
+- a trust policy based on ERC-8004-linked reputation
+
+Only trusted agents with valid AI-backed execution are allowed to act.
