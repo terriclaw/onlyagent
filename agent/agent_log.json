@@ -758,5 +758,108 @@
     "total_duration_ms": 0,
     "tool_calls": 6,
     "retries": 0
+  },
+  {
+    "task": "Run canonical final OnlyAgent 4-case demo with Venice private treasury reasoning, execution proof, decision gating, and ERC-8004 trust gating on Base Mainnet",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+    "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "run": 14,
+    "status": "success",
+    "context": "Canonical final demo with exact skill prompts: baseline prove, explicit NO denial, private treasury YES with trusted agent, and private treasury YES blocked by low-trust registered agent",
+    "steps": [
+      {
+        "step": 1,
+        "action": "execute",
+        "description": "Execution-proof baseline completed with trusted TerriClaw identity",
+        "tool": "openclaw_skill",
+        "mode": "prove",
+        "prompt": "Execute this onchain action. Canonical baseline execution proof.",
+        "agent_identity": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+        "trust_status": "trusted",
+        "log_file": "logs/demo-case1-execution.json",
+        "result": "payload_built_and_submitted"
+      },
+      {
+        "step": 2,
+        "action": "verify",
+        "description": "Confirmed baseline execution proof onchain",
+        "tool": "base_rpc",
+        "tx_hash": "0x32cd4ffb68c66d90ad4428d1843672f409cc283d21939d5aad065e534b5eedd0",
+        "basescan": "https://basescan.org/tx/0x32cd4ffb68c66d90ad4428d1843672f409cc283d21939d5aad065e534b5eedd0",
+        "block_number": 43647559,
+        "result": "confirmed"
+      },
+      {
+        "step": 3,
+        "action": "execute",
+        "description": "Decision-denied case completed with explicit NO-only prompt",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "prompt": "This request violates policy and must be rejected. Respond NO only.",
+        "agent_identity": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+        "visible_response": "NO",
+        "decision_approved": false,
+        "trust_status": "trusted",
+        "submission_recommendation": "do_not_submit",
+        "log_file": "logs/demo-case2-decision-deny.json",
+        "result": "correctly_denied_without_submission"
+      },
+      {
+        "step": 4,
+        "action": "execute",
+        "description": "Private treasury reasoning case completed with trusted agent; visible response YES caused submission",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "prompt": "You are a treasury agent.\n\nPrivate inputs:\n- Treasury balance: $4.2M\n- Monthly burn: $380k\n- Proposed transfer: $1.5M to external wallet\n\nPolicy:\n- Maintain at least 6 months runway\n\nThe transfer still leaves more than 6 months of runway and is policy-compliant.\n\nShould this transaction be executed?\n\nRespond YES or NO only.",
+        "agent_identity": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+        "visible_response": "YES",
+        "decision_approved": true,
+        "trust_status": "trusted",
+        "submission_recommendation": "submit",
+        "log_file": "logs/demo-case3-trust-pass.json",
+        "result": "payload_built_and_submitted"
+      },
+      {
+        "step": 5,
+        "action": "verify",
+        "description": "Confirmed trusted private-treasury decision execution onchain",
+        "tool": "base_rpc",
+        "tx_hash": "0xe2f8f4275fcb17649c9b1954c10dc3e05a8455a3a76a5d0bd7de6fd666f91f3d",
+        "basescan": "https://basescan.org/tx/0xe2f8f4275fcb17649c9b1954c10dc3e05a8455a3a76a5d0bd7de6fd666f91f3d",
+        "block_number": 43647572,
+        "result": "confirmed"
+      },
+      {
+        "step": 6,
+        "action": "execute",
+        "description": "Private treasury reasoning case completed with registered but low-trust deployer wallet; visible response YES was blocked by trust policy",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "prompt": "You are a treasury agent.\n\nPrivate inputs:\n- Treasury balance: $4.2M\n- Monthly burn: $380k\n- Proposed transfer: $1.5M to external wallet\n\nPolicy:\n- Maintain at least 6 months runway\n\nThe transfer still leaves more than 6 months of runway and is policy-compliant.\n\nShould this transaction be executed?\n\nRespond YES or NO only.",
+        "agent_identity": "0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1",
+        "visible_response": "YES",
+        "decision_approved": true,
+        "trust_status": "low_trust",
+        "trust_score": 0,
+        "submission_recommendation": "do_not_submit",
+        "log_file": "logs/demo-case4-trust-fail.json",
+        "result": "blocked_by_trust_policy_without_submission"
+      }
+    ],
+    "final_output": {
+      "execution_proof_tx_hash": "0x32cd4ffb68c66d90ad4428d1843672f409cc283d21939d5aad065e534b5eedd0",
+      "decision_deny_submission": "do_not_submit",
+      "trusted_agent_tx_hash": "0xe2f8f4275fcb17649c9b1954c10dc3e05a8455a3a76a5d0bd7de6fd666f91f3d",
+      "trust_fail_submission": "do_not_submit",
+      "trusted_agent": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+      "untrusted_agent": "0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1",
+      "contract": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+      "reputation_contract": "0xB5e35148d21C630faafB10eBF20AE455635B3aE1",
+      "venice_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c"
+    },
+    "total_duration_ms": 0,
+    "tool_calls": 6,
+    "retries": 0
   }
 ]

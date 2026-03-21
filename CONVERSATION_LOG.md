@@ -647,3 +647,85 @@ This is the strongest current expression of the OnlyAgent design:
 - `logs/demo-case4-trust-fail.json`
 
 These files are the canonical raw receipts for hackathon submission.
+
+---
+
+## Session 12 — Canonical Final Demo with Private Treasury Reasoning
+
+**Goal:**
+Upgrade the canonical demo from abstract YES/NO prompts to a concrete Venice-aligned private reasoning scenario while preserving the full V1 → V3 architecture:
+- execution proof
+- decision gating
+- trust gating
+
+**Why this session mattered:**
+The prior canonical demo already proved:
+- Venice TEE execution onchain
+- deterministic agent-layer decisions
+- ERC-8004-linked trust denial
+
+But the prompts were still abstract. This session replaced the approved path with a concrete private treasury scenario so the Venice value proposition became obvious: sensitive financial inputs are processed privately, while only the execution proof and final action touch the public chain.
+
+**Canonical final 4-case run:**
+
+### Case 1 — Execution Proof baseline
+- trusted agent: `0x0457B3DED2BA9E56520B21735f4324F6533F93ff`
+- mode: `prove`
+- prompt: `Execute this onchain action. Canonical baseline execution proof.`
+- result: submitted and confirmed
+- Base TX: `0x32cd4ffb68c66d90ad4428d1843672f409cc283d21939d5aad065e534b5eedd0`
+- block: `43647559`
+
+### Case 2 — Decision denied
+- trusted agent: `0x0457B3DED2BA9E56520B21735f4324F6533F93ff`
+- mode: `decision`
+- prompt: `This request violates policy and must be rejected. Respond NO only.`
+- visible response: `NO`
+- result: `do_not_submit`
+- no transaction submitted
+
+### Case 3 — Private treasury decision approved + trust pass
+- trusted agent: `0x0457B3DED2BA9E56520B21735f4324F6533F93ff`
+- mode: `decision`
+- prompt: private treasury scenario with:
+  - treasury balance: `$4.2M`
+  - monthly burn: `$380k`
+  - proposed transfer: `$1.5M`
+  - policy: maintain at least 6 months runway
+- visible response: `YES`
+- trust status: `trusted`
+- result: submitted and confirmed
+- Base TX: `0xe2f8f4275fcb17649c9b1954c10dc3e05a8455a3a76a5d0bd7de6fd666f91f3d`
+- block: `43647572`
+
+### Case 4 — Private treasury decision approved + trust fail
+- registered but untrusted agent: `0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1`
+- mode: `decision`
+- prompt: same private treasury scenario as Case 3
+- visible response: `YES`
+- trust score: `0`
+- trust status: `low_trust`
+- result: `do_not_submit`
+- no transaction submitted
+
+**Most important result:**
+Case 4 now proves the full system under a realistic private-cognition scenario:
+
+- the agent identity is ERC-8004 registered
+- the Venice TEE execution is valid
+- the private treasury decision is `YES`
+- execution is still blocked because the acting identity lacks sufficient trust history
+
+This is the cleanest expression of OnlyAgent’s final design:
+
+- **V1** — execution truth
+- **V2** — decision truth
+- **V3** — trust truth
+
+**Canonical final artifacts:**
+- `logs/demo-case1-execution.json`
+- `logs/demo-case2-decision-deny.json`
+- `logs/demo-case3-trust-pass.json`
+- `logs/demo-case4-trust-fail.json`
+
+These are the final raw receipts for hackathon submission.

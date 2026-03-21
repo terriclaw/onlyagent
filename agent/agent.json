@@ -21,7 +21,10 @@
     "contract_execution",
     "tee_signature_verification",
     "erc8004_trust_gating",
-    "trust_gated_execution"
+    "trust_gated_execution",
+    "private_treasury_reasoning",
+    "venice_private_cognition",
+    "verifiable_private_actions"
   ],
   "tech_stack": [
     "Node.js",
