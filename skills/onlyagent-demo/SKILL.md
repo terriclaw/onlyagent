@@ -79,6 +79,36 @@ Onchain enforcement:
 
 ---
 
+## Full demo test sequence
+
+For a full demo run, execute these three cases in order:
+
+1. **Execution Proof baseline**
+   - run default mode
+   - submit if a `tx` payload is returned
+   - report transaction result
+
+2. **Decision mode — approved case**
+   - run `ONLYAGENT_MODE=decision`
+   - use a prompt that should produce visible response `YES`
+   - submit only if `submissionRecommendation` is `submit`
+   - report visible response, decision result, and transaction result
+
+3. **Decision mode — denied case**
+   - run `ONLYAGENT_MODE=decision`
+   - use a prompt that should produce visible response other than `YES`
+   - if `submissionRecommendation` is `do_not_submit`, do not submit
+   - report visible response and denied outcome
+
+For all three cases:
+- log prompt
+- log visible response
+- log prompt hash and response hash
+- log whether submission occurred
+- log transaction hash if submitted
+
+---
+
 ## Expected result
 
 You must report:
