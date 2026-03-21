@@ -1,6 +1,21 @@
 # Logs
 
-## Final Demo (Session 10)
+## Final Demo (Session 11)
+Canonical 4-case demo used for hackathon submission.
+
+- demo-case1-execution.json → execution proof baseline (submitted)
+- demo-case2-decision-deny.json → decision NO (not submitted)
+- demo-case3-trust-pass.json → decision YES + trusted agent (submitted)
+- demo-case4-trust-fail.json → decision YES + untrusted agent (blocked)
+
+This demonstrates:
+- Venice TEE execution proof
+- Agent decision gating
+- ERC-8004 trust-gated execution
+
+Do not delete — these are verifiable demo receipts.
+
+## Previous Demo (Session 10)
 - run-1774058833.json → execution proof baseline (submitted)
 - run-1774058847.json → decision YES (submitted)
 - run-1774058867.json → decision NO (not submitted)
