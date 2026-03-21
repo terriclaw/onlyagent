@@ -375,32 +375,6 @@ This makes OnlyAgent not just an AI demo, but a **verifiable trusted-agent syste
 
 ---
 
-## Demo Cases
-
-The final demo consists of three cases:
-
-1. **Execution Proof baseline**
-   - default `prove` mode
-   - payload is built and submitted
-   - contract verifies Venice TEE execution onchain
-
-2. **Decision mode — approved**
-   - visible response is `YES`
-   - agent returns `submit`
-   - agent submits `prove()` onchain
-
-3. **Decision mode — denied**
-   - visible response is not `YES`
-   - agent returns `do_not_submit`
-   - no transaction is submitted
-
-This demonstrates both:
-- onchain execution provenance
-- offchain deterministic decision gating
-
----
-
-## Live Demo
 
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
 - 🔗 [Execution Proof TX](https://basescan.org/tx/0x27a3031e7306eb1d7e9f4f2f12a129693198f2fa944050e400c564f83403892d) — final baseline prove() demo on Base Mainnet
