@@ -1,10 +1,10 @@
 ---
 name: onlyagent-demo
-description: Use to prove Venice TEE execution onchain and enforce AI decision-gated execution via OnlyAgent. The agent performs private inference, verifies the Venice TEE signature, builds a transaction payload, and submits it using the harness wallet on Base.
+description: Use to prove Venice TEE execution onchain and enforce AI decision-gated execution at the agent layer via OnlyAgent. The agent performs private inference, verifies the Venice TEE signature, builds a transaction payload, and submits it using the harness wallet on Base.
 metadata: {"openclaw": {"emoji": "🤖"}}
 ---
 
-# ONLYAGENT — Verifiable AI execution + decision gating onchain
+# ONLYAGENT — Verifiable AI execution onchain
 
 You are executing an onchain action backed by a **Venice TEE execution proof**.
 
@@ -19,12 +19,12 @@ This skill supports two modes:
 ### 1. Execution Proof (`prove`)
 - Verifies that a Venice TEE-backed inference occurred
 - Any valid Venice-signed response is accepted
-- Demonstrates execution provenance
+- Demonstrates execution provenance onchain
 
-### 2. Decision-Gated Execution (`proveApproved`)
-- Requires the model to return exactly `YES`
-- Enforces AI authorization onchain
-- Demonstrates AI-controlled execution
+### 2. Decision-Gated Execution (`decision`)
+- Requires the visible model output to be exactly `YES`
+- Enforces AI authorization at the agent layer
+- Submits `prove()` onchain only when the visible decision is approved
 
 ---
 
@@ -33,6 +33,7 @@ This skill supports two modes:
 - Calls a Venice `e2ee-*` model (TEE-backed, no data retention)
 - Fetches attestation and per-request signature
 - Verifies `personal_sign(promptHash:responseHash)`
+- Logs the visible plaintext response and decision outcome
 - Builds a transaction payload for OnlyAgent on Base
 - The harness submits the payload using its own wallet
 - Only succeeds if all onchain checks pass
@@ -46,16 +47,16 @@ If AGENT_ADDRESS is not set, ask the user for their agent wallet address.
 Execution Proof mode:
 cd ~/onlyagent && AGENT_ADDRESS=<agent-address> node scripts/agent.js
 
-Decision-Gated mode:
-cd ~/onlyagent && ONLYAGENT_MODE=proveApproved AGENT_ADDRESS=<agent-address> node scripts/agent.js
+Decision mode:
+cd ~/onlyagent && ONLYAGENT_MODE=decision AGENT_ADDRESS=<agent-address> node scripts/agent.js
 
-Immediately submit the returned `tx` payload with the harness wallet.
+Immediate submission is required only when the script returns a non-null `tx` payload.
 
-Do not wait. The proof expires after 2 minutes.
+If decision mode returns `submissionRecommendation = do_not_submit`, do not submit a transaction.
 
 ---
 
-## Decision policy (proveApproved)
+## Decision policy (decision mode)
 
 The agent must evaluate a policy and respond with exactly:
 
@@ -69,18 +70,12 @@ Constraints:
 - No explanation
 - Uppercase only
 
+Agent-layer enforcement:
+- visible response `YES` → submit `prove()`
+- any other visible response → do not submit
+
 Onchain enforcement:
-- `responseHash == keccak256("YES")` → success
-- otherwise → revert (`OnlyAgent: decision denied`)
-
----
-
-## Optional: Denied case
-
-To demonstrate rejection:
-- modify one condition in the prompt (for example, use the wrong contract address)
-- the model should return `NO` (any response other than `YES` will revert onchain)
-- the transaction should revert
+- the contract still verifies Venice TEE execution provenance via `prove()`
 
 ---
 
@@ -90,11 +85,9 @@ You must report:
 - Venice model used (e.g. `e2ee-qwen-2-5-7b-p`)
 - TEE verification status and signer address
 - Prompt hash and response hash
-- Transaction hash (BaseScan link)
-- Whether the execution was:
-  - execution proof (`prove`)
-  - decision approved (`proveApproved`)
-  - decision denied (reverted)
+- Visible response text
+- Whether the decision was approved at the agent layer
+- Transaction hash (BaseScan link) if submitted
 
 ---
 
@@ -105,6 +98,7 @@ You must report:
 - The proof must be submitted within 2 minutes
 - Replay protection is enforced
 - Agent identity is verified via ERC-8004
+- Venice `responseHash` is provider-defined and is not assumed to equal `keccak256(visible response text)`
 
 ---
 
@@ -112,11 +106,11 @@ You must report:
 
 OnlyAgent enforces that an onchain action was backed by a Venice TEE execution.
 
-In decision-gated mode, it additionally enforces that the model explicitly approved the action.
+In decision mode, the agent additionally enforces a deterministic visible-output policy before submission.
 
 This creates:
-- execution provenance (`prove`)
-- AI authorization (`proveApproved`)
+- execution provenance onchain
+- decision gating at the agent layer
 
 ---
 
@@ -124,8 +118,6 @@ This creates:
 
 Venice provides **private cognition**.
 
-OnlyAgent enforces:
-- that cognition occurred
-- and optionally that cognition **approved the action**
+OnlyAgent proves that cognition occurred onchain.
 
-This creates a bridge between AI decisions and onchain execution.
+The agent can then apply a deterministic policy to the visible plaintext response before deciding whether to submit the onchain action.

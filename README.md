@@ -17,9 +17,9 @@ OnlyAgent wires **Venice private cognition to trustworthy onchain action**.
 
 This directly implements the Venice track requirement: connecting private inference to public systems where actions must be verifiable.
 
-OnlyAgent does not interpret model outputs or reasoning. It enforces that a Venice-backed execution occurred before an onchain action is permitted.
+OnlyAgent does not interpret model outputs or reasoning onchain. It enforces that a Venice-backed execution occurred before an onchain action is permitted.
 
-This converts private cognition into an enforceable condition for onchain execution.
+Decision policies can be applied at the agent layer using the visible plaintext response, while the contract continues to verify trusted TEE execution onchain.
 
 **Example use case: Private treasury agent**
 
@@ -135,13 +135,19 @@ The contract verifies the signature onchain and enforces that:
 
 This allows protocols to accept actions derived from private inference while maintaining public verifiability of execution.
 
+### Decision gating today
+
+OnlyAgent currently proves Venice TEE execution onchain. Agent-layer decision gating can be added by inspecting the visible plaintext response and only submitting `prove()` when a deterministic policy passes.
+
+Direct onchain enforcement of specific visible response strings is currently blocked by provider-defined `responseHash` semantics from Venice's signature endpoint.
+
 ---
 
 ## Contracts (Base Mainnet)
 
 | Contract | Address |
 |---|---|
-| OnlyAgent (demo) | `0x2248bb37821f8675B4de7786c8C5d1E15333E869` |
+| OnlyAgent (demo) | `0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D` |
 | AgentReputation | `0xB5e35148d21C630faafB10eBF20AE455635B3aE1` |
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
 

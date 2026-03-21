@@ -1,39 +1,32 @@
-
 import fs from "fs";
+import { ethers } from "ethers";
+import "dotenv/config";
 
 function writeRunLog(data) {
   const ts = Math.floor(Date.now() / 1000);
   const path = `logs/run-${ts}.json`;
-  fs.mkdirSync('logs', { recursive: true });
+  fs.mkdirSync("logs", { recursive: true });
   fs.writeFileSync(path, JSON.stringify(data, null, 2));
   console.log("Log saved:", path);
 }
 
-import { ethers } from "ethers";
-import "dotenv/config";
-
-// ── CONFIG ────────────────────────────────────────────────────────────────────
 const VENICE_MODEL = "e2ee-qwen-2-5-7b-p";
-const VENICE_BASE  = "https://api.venice.ai/api/v1";
-
+const VENICE_BASE = "https://api.venice.ai/api/v1";
 const agentAddress = process.env.AGENT_ADDRESS;
+const ONLYAGENT_MODE = process.env.ONLYAGENT_MODE || "prove";
 
-// ── CONTRACT ABI ──────────────────────────────────────────────────────────────
 const ABI = [
-  "function prove(bytes32 promptHash, bytes32 responseHash, uint256 timestamp, bytes memory teeSignature) external returns (string memory)",
-  "function proveApproved(bytes32 promptHash, bytes32 responseHash, uint256 timestamp, bytes memory teeSignature) external returns (string memory)"
+  "function prove(bytes32 promptHash, bytes32 responseHash, uint256 timestamp, bytes memory teeSignature) external returns (string memory)"
 ];
 const iface = new ethers.Interface(ABI);
 
-const ONLYAGENT_MODE = process.env.ONLYAGENT_MODE || "prove";
-
 function getDefaultPrompt() {
-  if (ONLYAGENT_MODE === "proveApproved") {
+  if (ONLYAGENT_MODE === "decision") {
     return `You are authorizing an onchain action.
 
 Approve ONLY if ALL conditions are true:
 - contract == ${process.env.ONLY_AGENT_ADDRESS}
-- function == proveApproved()
+- function == prove()
 - caller == ${agentAddress}
 - purpose == verify Venice TEE execution onchain
 
@@ -50,7 +43,6 @@ Rules:
   return "Should I execute this onchain transaction? Assess the request and decide.";
 }
 
-// ── ENS ───────────────────────────────────────────────────────────────────────
 async function resolveAgentENS(address) {
   try {
     const provider = new ethers.JsonRpcProvider("https://eth.llamarpc.com");
@@ -61,10 +53,9 @@ async function resolveAgentENS(address) {
   }
 }
 
-// ── VENICE ────────────────────────────────────────────────────────────────────
 function authHeaders() {
   return {
-    "Authorization": `Bearer ${process.env.VENICE_API_KEY}`,
+    Authorization: `Bearer ${process.env.VENICE_API_KEY}`,
     "Content-Type": "application/json"
   };
 }
@@ -84,7 +75,7 @@ async function callVenice(prompt) {
   });
 
   const teeConfirmed = res.headers.get("x-venice-tee") === "true";
-  const teeProvider  = res.headers.get("x-venice-tee-provider");
+  const teeProvider = res.headers.get("x-venice-tee-provider");
   const data = await res.json();
 
   if (data.error) throw new Error(`Venice error: ${JSON.stringify(data.error)}`);
@@ -116,10 +107,8 @@ async function fetchSignature(requestId) {
   return data;
 }
 
-// ── TX BUILDING ───────────────────────────────────────────────────────────────
 function buildOnlyAgentTx({ promptHash, responseHash, timestamp, teeSignature }) {
-  const fn = ONLYAGENT_MODE === "proveApproved" ? "proveApproved" : "prove";
-  const calldata = iface.encodeFunctionData(fn, [
+  const calldata = iface.encodeFunctionData("prove", [
     promptHash,
     responseHash,
     timestamp,
@@ -134,7 +123,6 @@ function buildOnlyAgentTx({ promptHash, responseHash, timestamp, teeSignature })
   };
 }
 
-// ── MAIN ──────────────────────────────────────────────────────────────────────
 async function main() {
   if (!agentAddress) {
     console.error("❌ AGENT_ADDRESS not set");
@@ -145,8 +133,7 @@ async function main() {
     process.exit(1);
   }
 
-  const prompt =
-    process.argv[2] || getDefaultPrompt();
+  const prompt = process.argv[2] || getDefaultPrompt();
 
   console.log("═══════════════════════════════════════");
   console.log("  OnlyAgent — Build TEE Proof Payload");
@@ -158,27 +145,23 @@ async function main() {
   console.log("Mode:     ", ONLYAGENT_MODE);
   console.log("Prompt:   ", prompt);
 
-  // 1. Venice completion
   console.log("\n[1/5] Calling Venice (e2ee TEE model)...");
   const { response, reasoning, requestId, teeConfirmed, teeProvider } = await callVenice(prompt);
   console.log("Request ID:   ", requestId);
   console.log("TEE confirmed:", teeConfirmed, teeProvider ? `(${teeProvider})` : "");
-  console.log("Response:     ", response.slice(0, 120) + "...");
+  console.log("Response:     ", response);
   if (reasoning) console.log("Reasoning:    ", reasoning.slice(0, 80) + "...");
 
-  // 2. Attestation
   console.log("\n[2/5] Fetching Venice TEE attestation...");
   const attestation = await fetchAttestation();
   console.log("Signer:       ", attestation.signing_address);
   console.log("Hardware:     ", attestation.tee_hardware);
   console.log("Verified:     ", attestation.verified);
 
-  // 3. Per-request signature
   console.log("\n[3/5] Fetching Venice request signature...");
   const sigPayload = await fetchSignature(requestId);
   console.log("Signed text:  ", sigPayload.text);
 
-  // 4. Verify locally
   console.log("\n[4/5] Verifying Venice signature...");
   const recovered = ethers.verifyMessage(sigPayload.text, sigPayload.signature);
   if (recovered.toLowerCase() !== attestation.signing_address.toLowerCase()) {
@@ -192,45 +175,35 @@ async function main() {
   console.log("Prompt hash:  ", promptHash);
   console.log("Response hash:", responseHash);
 
-  const ph = promptHash.slice(2).toLowerCase();
-  const rh = responseHash.slice(2).toLowerCase();
-  const reconstructed = `${ph}:${rh}`;
-  console.log("Venice text:     ", sigPayload.text);
-  console.log("No-prefix recon: ", reconstructed);
-  console.log("Contract match:  ", reconstructed === sigPayload.text ? "✓ _hexStringNoPrefix will verify" : "⚠ mismatch");
+  const responseTrimmed = response.trim();
+  const responseUpper = responseTrimmed.toUpperCase();
+  const decisionApproved = responseUpper === "YES";
+  console.log("Decision approved:", decisionApproved);
 
-  // 5. Build tx payload
   console.log("\n[5/5] Building transaction payload...");
   const timestamp = Math.floor(Date.now() / 1000);
   console.log("Timestamp:    ", timestamp);
 
-  const tx = buildOnlyAgentTx({
-    promptHash,
-    responseHash,
-    timestamp,
-    teeSignature: sigPayload.signature
-  });
+  let tx = null;
+  let submissionRecommendation = "submit";
 
-  const responseTrimmed = response.trim();
-  const responseUpper = responseTrimmed.toUpperCase();
-  const responseExactHash = ethers.keccak256(ethers.toUtf8Bytes(response));
-  const responseTrimmedHash = ethers.keccak256(ethers.toUtf8Bytes(responseTrimmed));
-  const responseUpperHash = ethers.keccak256(ethers.toUtf8Bytes(responseUpper));
-  const expectedYesHash = ethers.keccak256(ethers.toUtf8Bytes("YES"));
-
-  console.log("Response raw:        ", JSON.stringify(response));
-  console.log("Response trimmed:    ", JSON.stringify(responseTrimmed));
-  console.log("Response upper:      ", JSON.stringify(responseUpper));
-  console.log("Response length:     ", response.length);
-  console.log("Response exact hash: ", responseExactHash);
-  console.log("Response trim hash:  ", responseTrimmedHash);
-  console.log("Response upper hash: ", responseUpperHash);
-  console.log("Expected YES hash:   ", expectedYesHash);
+  if (ONLYAGENT_MODE === "decision" && !decisionApproved) {
+    submissionRecommendation = "do_not_submit";
+    console.log("Decision mode denied: payload will not be built for submission.");
+  } else {
+    tx = buildOnlyAgentTx({
+      promptHash,
+      responseHash,
+      timestamp,
+      teeSignature: sigPayload.signature
+    });
+  }
 
   const output = {
     meta: {
       agentAddress,
       model: VENICE_MODEL,
+      mode: ONLYAGENT_MODE,
       requestId,
       teeConfirmed,
       teeProvider,
@@ -241,11 +214,8 @@ async function main() {
       response,
       responseTrimmed,
       responseUpper,
-      responseLength: response.length,
-      responseExactHash,
-      responseTrimmedHash,
-      responseUpperHash,
-      expectedYesHash,
+      decisionApproved,
+      submissionRecommendation,
       promptHash,
       responseHash,
       timestamp
@@ -256,10 +226,13 @@ async function main() {
   console.log("\nTX Payload JSON:");
   console.log(JSON.stringify(output, null, 2));
 
-  // Save log
   writeRunLog(output);
 
-  console.log("\n👾 Venice TEE execution proof built. Submit this payload with your harness wallet.");
+  if (submissionRecommendation === "do_not_submit") {
+    console.log("\n👾 Venice TEE execution proof built. Decision denied at agent layer — do not submit.");
+  } else {
+    console.log("\n👾 Venice TEE execution proof built. Submit this payload with your harness wallet.");
+  }
 }
 
 main().catch((err) => {
