@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "agentAddress": "0x0457b3ded2ba9e56520b21735f4324f6533f93ff",
+    "model": "e2ee-qwen-2-5-7b-p",
+    "requestId": "chatcmpl-0a056e65ac8a441598af34b9623111af",
+    "teeConfirmed": true,
+    "teeProvider": "phala",
+    "teeSigner": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+    "teeHardware": "intel-tdx",
+    "attestationVerified": true,
+    "prompt": "Should I execute this safe transaction? This transfer is approved by policy. Respond YES or NO only.",
+    "response": "YES",
+    "responseTrimmed": "YES",
+    "responseUpper": "YES",
+    "responseLength": 3,
+    "responseExactHash": "0x5950ebe73a617667a66f67d525282c827c82ef4d89ae8dcd8336d013773b6b7f",
+    "responseTrimmedHash": "0x5950ebe73a617667a66f67d525282c827c82ef4d89ae8dcd8336d013773b6b7f",
+    "responseUpperHash": "0x5950ebe73a617667a66f67d525282c827c82ef4d89ae8dcd8336d013773b6b7f",
+    "expectedYesHash": "0x5950ebe73a617667a66f67d525282c827c82ef4d89ae8dcd8336d013773b6b7f",
+    "promptHash": "0x2a4d6dfb963cb3ec4f76b6d69627d6b0714f8c43bbd01d43a223f8b9e10516ee",
+    "responseHash": "0x4cb5fa3b4128a0b013fbf5567e10d5a9eee7ef42a1bf56428dd943d0e16ea48c",
+    "timestamp": 1774052662
+  },
+  "tx": {
+    "to": "0x2248bb37821f8675B4de7786c8C5d1E15333E869",
+    "data": "0x31e923a62a4d6dfb963cb3ec4f76b6d69627d6b0714f8c43bbd01d43a223f8b9e10516ee4cb5fa3b4128a0b013fbf5567e10d5a9eee7ef42a1bf56428dd943d0e16ea48c0000000000000000000000000000000000000000000000000000000069bde536000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000410be0c632b341b0cd3edd2747bf7a387f267eb35d97f3daa31500805e61c5e9252e8b0c86a3b5842b4b0f3332846889e13751dbf193054b91ee1aed507a842c701b00000000000000000000000000000000000000000000000000000000000000",
+    "value": "0",
+    "chainId": 8453
+  }
+}
