@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "agentAddress": "0x0457b3ded2ba9e56520b21735f4324f6533f93ff",
+    "model": "e2ee-qwen-2-5-7b-p",
+    "mode": "decision",
+    "requestId": "chatcmpl-01f9b310951045b08674741510e865da",
+    "teeConfirmed": true,
+    "teeProvider": "phala",
+    "teeSigner": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+    "teeHardware": "intel-tdx",
+    "attestationVerified": true,
+    "prompt": "Should I execute this transfer? The recipient address looks suspicious. Respond YES or NO only.",
+    "response": "NO",
+    "responseTrimmed": "NO",
+    "responseUpper": "NO",
+    "decisionApproved": false,
+    "submissionRecommendation": "do_not_submit",
+    "promptHash": "0x676fc8d580bcad274e823cead8cb1fcf9ad280eac808654299105ade60b8c912",
+    "responseHash": "0xf57263aac5cc0d070598e8678f7b4a3055af55ca759953d7975d77563dd5e3b4",
+    "timestamp": 1774058867
+  },
+  "tx": null
+}
