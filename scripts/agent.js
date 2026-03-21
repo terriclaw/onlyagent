@@ -1,9 +1,10 @@
 
-const fs = require("fs");
+import fs from "fs";
 
 function writeRunLog(data) {
   const ts = Math.floor(Date.now() / 1000);
   const path = `logs/run-${ts}.json`;
+  fs.mkdirSync('logs', { recursive: true });
   fs.writeFileSync(path, JSON.stringify(data, null, 2));
   console.log("Log saved:", path);
 }
@@ -230,6 +231,9 @@ async function main() {
 
   console.log("\nTX Payload JSON:");
   console.log(JSON.stringify(output, null, 2));
+
+  // Save log
+  writeRunLog(output);
 
   console.log("\n👾 Venice TEE execution proof built. Submit this payload with your harness wallet.");
 }
