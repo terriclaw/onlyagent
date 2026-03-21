@@ -1,8 +1,8 @@
 # OnlyAgent
 
-A smart contract primitive for **verifiable AI agent execution onchain**.
+A smart contract primitive for **verifiable AI execution onchain with agent-layer decision gating**.
 
-`onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider that exposes Ethereum-verifiable ECDSA signatures. The current Base Mainnet demo verifies signatures from Venice AI's live TEE signer directly onchain.
+`onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider that exposes Ethereum-verifiable ECDSA signatures. The current Base Mainnet demo verifies signatures from Venice AI's live TEE signer directly onchain, while the agent runtime applies deterministic policy to the visible plaintext response before submission.
 
 ---
 
@@ -17,9 +17,7 @@ OnlyAgent wires **Venice private cognition to trustworthy onchain action**.
 
 This directly implements the Venice track requirement: connecting private inference to public systems where actions must be verifiable.
 
-OnlyAgent does not interpret model outputs or reasoning onchain. It enforces that a Venice-backed execution occurred before an onchain action is permitted.
-
-Decision policies can be applied at the agent layer using the visible plaintext response, while the contract continues to verify trusted TEE execution onchain.
+OnlyAgent does not interpret model outputs or reasoning onchain. It enforces that a Venice-backed execution occurred before an onchain action is permitted. The agent runtime can then apply deterministic decision policy to the visible plaintext response before deciding whether to submit the onchain action.
 
 **Example use case: Private treasury agent**
 
@@ -29,6 +27,22 @@ The contract only allows transfers if a valid Venice TEE execution proof is prov
 ---
 
 
+
+## Final Architecture
+
+OnlyAgent now has a clean separation of concerns:
+
+- **Contract layer** — verifies Venice TEE execution provenance onchain
+- **Agent layer** — reads the visible plaintext response and applies deterministic decision policy
+- **Harness wallet** — submits only when the agent says `submit`
+
+This means:
+- the contract proves that trusted AI execution occurred
+- the agent decides whether that visible output justifies acting
+
+This is the final architecture used in the current Base Mainnet demo.
+
+---
 
 ## The Primitive
 
@@ -137,7 +151,7 @@ This allows protocols to accept actions derived from private inference while mai
 
 ### Decision gating today
 
-OnlyAgent currently proves Venice TEE execution onchain. Agent-layer decision gating can be added by inspecting the visible plaintext response and only submitting `prove()` when a deterministic policy passes.
+OnlyAgent currently proves Venice TEE execution onchain. Agent-layer decision gating is implemented by inspecting the visible plaintext response and only submitting `prove()` when a deterministic policy passes.
 
 Direct onchain enforcement of specific visible response strings is currently blocked by provider-defined `responseHash` semantics from Venice's signature endpoint.
 
@@ -153,10 +167,36 @@ Direct onchain enforcement of specific visible response strings is currently blo
 
 ---
 
+## Demo Cases
+
+The final demo consists of three cases:
+
+1. **Execution Proof baseline**
+   - default `prove` mode
+   - payload is built and submitted
+   - contract verifies Venice TEE execution onchain
+
+2. **Decision mode — approved**
+   - visible response is `YES`
+   - agent returns `submit`
+   - agent submits `prove()` onchain
+
+3. **Decision mode — denied**
+   - visible response is not `YES`
+   - agent returns `do_not_submit`
+   - no transaction is submitted
+
+This demonstrates both:
+- onchain execution provenance
+- offchain deterministic decision gating
+
+---
+
 ## Live Demo
 
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
-- 🔗 [Demo TX](https://basescan.org/tx/0xc356c1dba0cb5945ae4fcca77b3d56da2896bc7c952cb66e9ce840942912779a) — TerriClaw (terriclaw.terricola.eth) calling prove() on Base Mainnet
+- 🔗 [Execution Proof TX](https://basescan.org/tx/0x27a3031e7306eb1d7e9f4f2f12a129693198f2fa944050e400c564f83403892d) — final baseline prove() demo on Base Mainnet
+- 🔗 [Decision YES TX](https://basescan.org/tx/0x2d9053d7e838a2561fa8f62f1d3f44e76468f4c2e9393e57bc01b2e5398d7b8b) — final decision-approved demo on Base Mainnet
 
 ---
 
@@ -272,7 +312,7 @@ contracts/
   AgentReputation.sol   # onchain reputation registry
   OnlyAgent.sol         # demo contract with prove()
 scripts/
-  agent.js              # end-to-end proof pipeline
+  agent.js              # proof pipeline + agent-layer decision gating
   deploy.js             # deployment script
 skills/
   onlyagent-demo/       # OpenClaw skill — lets TerriClaw run the demo
