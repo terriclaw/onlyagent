@@ -111,30 +111,12 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 ## Use Cases
 
-**AI-gated governance** — A DAO requires agents to produce a verified TEE execution proof before submitting proposals. Only an agent with a valid proof can call `submitProposal()`.
+**Autonomous treasury execution** — Agents managing funds must produce a verified TEE execution proof before transfers.
 
-**Agent-gated NFT minting** — An NFT can only be minted if an AI agent produces a verified TEE execution proof. No verified execution proof, no mint.
-
-**Autonomous treasury execution** — Agents managing a protocol treasury must produce an attested execution proof before executing transfers. Every fund movement is traceable to a specific AI output.
-
-**Cross-chain risk guards** — Before funds are bridged, an AI risk agent must evaluate the transfer and produce a verified TEE execution proof. The bridge contract verifies it before releasing funds.
+**AI-gated governance** — Only agents with verified AI execution can submit proposals or actions.
 
 ---
 
-## ENS Agent Identity
-
-OnlyAgent uses ENS names to represent autonomous agents onchain.
-
-Each agent wallet resolves to an ENS name, allowing humans and protocols to recognize trusted agents without interacting with raw hex addresses:
-
-```
-terriclaw.terricola.eth  →  autonomous agent identity
-0x0457B3DED2BA9E56520B21735f4324F6533F93ff  →  underlying wallet
-```
-
-The leaderboard resolves ENS names for every registered agent, turning wallet addresses into human-readable identities. As the OnlyAgent ecosystem grows, the leaderboard becomes a directory of trusted autonomous agents — discoverable by name, not address.
-
----
 
 ## Private Inference → Verifiable Actions
 
@@ -254,15 +236,6 @@ node scripts/agent.js "Should I execute this transaction? Assess the request and
 
 ---
 
-## Bankr Autonomous Execution
-
-TerriClaw executes transactions using the Bankr wallet system.
-
-The agent does not hold a private key. Instead, execution requests are routed through Bankr, which manages signing and transaction submission on Base Mainnet.
-
-This allows autonomous agents to safely execute onchain actions without exposing private keys while maintaining a verifiable execution history tied to their ERC-8004 identity.
-
----
 
 ## Venice TEE Integration
 
