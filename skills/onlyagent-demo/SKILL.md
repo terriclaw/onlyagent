@@ -103,12 +103,12 @@ Submission rule:
 Use these identities to demonstrate trust behavior:
 
 - **Trusted agent (pass case)**  
-  Use your registered agent (e.g. TerriClaw)  
-  → expected: trust = trusted
+  TerriClaw / primary agent wallet  
+  → expected: ERC-8004 passes, trust = trusted
 
 - **Untrusted agent (fail case)**  
   0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1  
-  → expected: trust = low_trust (no reputation)
+  → expected: ERC-8004 passes, trust = low_trust
 
 ---
 
@@ -119,25 +119,35 @@ Execute these four cases in order:
 1. **Execution Proof baseline**
    - run default mode
    - submit if a `tx` payload is returned
+   - report transaction result
 
 2. **Decision denied**
-   - visible response ≠ YES
+   - run `ONLYAGENT_MODE=decision`
+   - use a prompt that should produce visible response other than `YES`
    - do not submit
+   - report visible response and denied outcome
 
 3. **Decision approved + trust pass**
-   - visible response = YES
+   - run `ONLYAGENT_MODE=decision`
+   - use a prompt that should produce visible response `YES`
    - use trusted agent identity
-   - submit transaction
+   - submit only if `submissionRecommendation` is `submit`
+   - report visible response, trust status, decision result, and transaction result
 
 4. **Decision approved + trust fail**
-   - visible response = YES
+   - run `ONLYAGENT_MODE=decision`
+   - use a prompt that should produce visible response `YES`
    - use untrusted agent: 0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1
-   - do not submit
+   - if `submissionRecommendation` is `do_not_submit`, do not submit
+   - report visible response, trust failure, and denied outcome
 
-This proves:
-- execution correctness
-- decision gating
-- trust-gated execution
+For all four cases:
+- log prompt
+- log visible response
+- log prompt hash and response hash
+- log trust status
+- log whether submission occurred
+- log transaction hash if submitted
 
 ---
 
@@ -150,6 +160,7 @@ You must report:
 - Visible response
 - Decision result
 - Trust status (`trusted`, `stale`, `low_trust`)
+- Whether trust policy passed
 - Whether submission occurred
 - Transaction hash if submitted
 
@@ -162,15 +173,16 @@ You must report:
 - The proof must be submitted within 2 minutes
 - Replay protection is enforced
 - Agent identity is verified via ERC-8004
+- Venice `responseHash` is provider-defined and is not assumed to equal `keccak256(visible response text)`
 
 ---
 
 ## Why this matters
 
 OnlyAgent enforces that an onchain action:
-- was backed by private TEE execution
+- was backed by a Venice TEE execution
 - was explicitly approved by the agent
-- originates from a trusted agent identity
+- originates from a trusted agent identity with recent verifiable history
 
 This creates:
 - execution provenance
@@ -181,8 +193,12 @@ This creates:
 
 ## Mental model
 
-Venice → private cognition  
-OnlyAgent → verifiable execution  
-Agent → decision + trust enforcement  
+Venice provides **private cognition**.
+
+OnlyAgent proves that cognition occurred onchain.
+
+The agent then applies:
+- a deterministic decision policy to the visible plaintext response
+- a trust policy based on ERC-8004-linked reputation
 
 Only trusted agents with valid AI-backed execution are allowed to act.
