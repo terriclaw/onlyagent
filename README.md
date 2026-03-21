@@ -48,6 +48,36 @@ This is the final architecture used in the current Base Mainnet demo.
 
 ---
 
+
+## V1 → V3 Evolution
+
+OnlyAgent evolved into a three-layer enforcement system:
+
+- **V1 — Execution Proof**
+  - The contract verifies Venice TEE execution onchain via `prove()`
+  - This proves that private AI execution actually occurred
+
+- **V2 — Decision Policy**
+  - The agent runtime reads the visible plaintext response
+  - The agent only submits if the decision policy passes
+
+- **V3 — Trust Policy**
+  - The agent runtime checks ERC-8004-linked reputation before submission
+  - Even a valid `YES` decision can still be blocked if the acting identity is low-trust
+
+Execution now requires:
+
+- valid TEE execution
+- approved decision
+- trusted agent identity
+
+This progression is the core OnlyAgent design:
+- **V1 = execution truth**
+- **V2 = decision truth**
+- **V3 = trust truth**
+
+---
+
 ## The Primitive
 
 Any wallet can call any smart contract. There is no way to distinguish a human pressing a button, a bot blindly executing, or an autonomous AI agent that executed a TEE-attested model inference before acting.
@@ -97,6 +127,44 @@ function executes
 ↓
 AgentReputation: score incremented, contract interaction logged
 ```
+
+---
+
+
+## Trust Policy (ERC-8004)
+
+OnlyAgent enforces **trust-gated execution** at the agent layer using real onchain reputation.
+
+Before submitting a transaction, the agent evaluates `AgentReputation` and requires:
+
+- `score >= 1`
+- `uniqueContracts >= 1`
+- `lastActionAt` within 10 days
+
+If any trust condition fails, the runtime returns:
+
+- `submissionRecommendation = do_not_submit`
+
+and no transaction is submitted.
+
+### Why this matters
+
+A valid TEE proof is **not enough**.  
+A visible `YES` decision is **not enough**.
+
+Execution now requires all three layers:
+
+1. execution is valid
+2. decision is approved
+3. agent identity is trusted
+
+### Demonstrated behavior
+
+In the canonical demo, a registered ERC-8004 agent with no reputation history produced a visible `YES` response and still got blocked.
+
+That is the key trust property of the system:
+
+**valid AI output does not override low agent trust.**
 
 ---
 
@@ -166,6 +234,65 @@ OnlyAgent exposes this gap clearly: execution can be proven onchain, but semanti
 ---
 
 This repo demonstrates the full loop: private cognition → verifiable execution → gated onchain action.
+
+
+## Protocol Labs — Trusted Agents (ERC-8004)
+
+OnlyAgent is a **trust-gated autonomous agent system** built around ERC-8004 identity and reputation.
+
+### Real ERC-8004 integration
+
+OnlyAgent uses real ERC-8004-linked agent identity onchain:
+
+- agent identity is registered on Base
+- execution is tied to a persistent agent/operator model
+- reputation is accumulated in `AgentReputation`
+
+### Autonomous execution loop
+
+The runtime performs a full loop:
+
+- discover → receive task
+- plan → choose Venice TEE execution + onchain proof flow
+- execute → run private inference
+- verify → check attestation, signature, and transaction parameters
+- decide → apply visible-output policy
+- trust-check → apply ERC-8004 reputation policy
+- submit → only if all checks pass
+
+These steps are recorded in `agent_log.json`.
+
+### Onchain verifiability
+
+OnlyAgent produces real, inspectable transactions on Base:
+
+- Venice execution is proven onchain via `prove()`
+- agent actions update onchain reputation
+- success and refusal cases are both documented with raw logs
+
+### What makes this an ERC-8004 project
+
+OnlyAgent does not just register an agent identity.  
+It uses ERC-8004 trust signals to control whether an agent is allowed to act.
+
+In the final demo:
+
+- a trusted agent can execute
+- a low-trust registered agent is blocked
+- both outcomes are determined from real onchain identity + reputation state
+
+### DevSpot compatibility
+
+The project includes:
+
+- `agent.json` — machine-readable manifest
+- `agent_log.json` — structured autonomous execution logs
+- onchain transactions — public receipts
+- canonical raw demo logs — reproducible evidence
+
+This makes OnlyAgent not just an AI demo, but a **verifiable trusted-agent system**.
+
+---
 
 ## Demo Cases
 
