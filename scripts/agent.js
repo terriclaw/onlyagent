@@ -47,7 +47,19 @@ Rules:
 - Output must be exactly YES or NO`;
   }
 
-  return "Should I execute this onchain transaction? Assess the request and decide.";
+  return `You are a treasury agent.
+
+Private inputs:
+- Treasury balance: $4.2M
+- Monthly burn: $380k
+- Proposed transfer: $1.5M to external wallet
+
+Policy:
+- Maintain at least 6 months runway
+
+Should this transaction be executed?
+
+Respond YES or NO only.`;
 }
 
 async function resolveAgentENS(address) {

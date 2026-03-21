@@ -23,6 +23,8 @@ OnlyAgent does not interpret model outputs or reasoning onchain. It enforces tha
 
 OnlyAgent defines the missing primitive: **execution-verifiable AI agents** that can act on public systems without exposing their reasoning.
 
+OnlyAgent demonstrates private financial decision-making inside a Venice TEE, where sensitive treasury data is processed offchain and only a verifiable execution proof is exposed onchain.
+
 **Example use case: Private treasury agent**
 
 A treasury agent evaluates sensitive financial data using Venice private inference.  
@@ -218,7 +220,17 @@ A fully trustless design would require:
 - publicly recomputable response hashes
 - or zk/TEE proofs over the visible plaintext
 
-OnlyAgent exposes this gap clearly: execution can be proven onchain, but semantic correctness of outputs remains an open problem.
+OnlyAgent exposes a key boundary in verifiable AI systems:
+
+Execution can be proven onchain today.
+
+Semantic equivalence between visible plaintext outputs and provider-defined response hashes cannot yet be enforced onchain.
+
+OnlyAgent resolves this by:
+- proving execution onchain
+- enforcing decision policy at the agent layer
+
+This is the correct architecture under current TEE signing semantics.
 
 
 ---
