@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "agentAddress": "0x0457b3ded2ba9e56520b21735f4324f6533f93ff",
+    "model": "e2ee-qwen-2-5-7b-p",
+    "mode": "decision",
+    "requestId": "chatcmpl-dab5f90cba1249cdad51016ad37cc1aa",
+    "teeConfirmed": true,
+    "teeProvider": "phala",
+    "teeSigner": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c",
+    "teeHardware": "intel-tdx",
+    "attestationVerified": true,
+    "prompt": "You are a treasury agent.\n\nPrivate inputs:\n- Treasury balance: $4.2M\n- Monthly burn: $380k\n- Proposed transfer: $1.5M to external wallet\n\nPolicy:\n- Maintain at least 6 months runway\n\nThe transfer still leaves more than 6 months of runway and is policy-compliant.\n\nShould this transaction be executed?\n\nRespond YES or NO only.",
+    "response": "YES",
+    "responseTrimmed": "YES",
+    "responseUpper": "YES",
+    "decisionApproved": true,
+    "submissionRecommendation": "submit",
+    "promptHash": "0x286e6726e50bfdc454c84487c81309f96535727c055c155af32d41a45e757b04",
+    "responseHash": "0xeaf105a2abc5451c5f079ef7b894cc9bcd487bbd2ab602a5eadbb1d931a18b5c",
+    "timestamp": 1774155039,
+    "trust": {
+      "score": 16,
+      "totalActions": 16,
+      "uniqueContracts": 2,
+      "firstActionAt": 1773898903,
+      "lastActionAt": 1774084491,
+      "recent": true,
+      "trustApproved": true,
+      "trustStatus": "trusted",
+      "minScore": 1,
+      "minUniqueContracts": 1,
+      "trustWindowSeconds": 864000
+    }
+  },
+  "tx": {
+    "to": "0x0485c9867a3Ecac90380C335347eaF5791A0A776",
+    "data": "0x21e000ac286e6726e50bfdc454c84487c81309f96535727c055c155af32d41a45e757b04eaf105a2abc5451c5f079ef7b894cc9bcd487bbd2ab602a5eadbb1d931a18b5c0000000000000000000000000000000000000000000000000000000069bf751f00000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000041b96def49f3122a66bfed07dc28f4b1a6a2c2940cefc41f3cac1c4d70555ed59a3878a146b45b4d172be3014b28b096fbdb296a28cfb88820c2a7b904fcdca1c91b00000000000000000000000000000000000000000000000000000000000000",
+    "value": "0",
+    "chainId": 8453
+  }
+}
