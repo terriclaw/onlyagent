@@ -44,9 +44,29 @@ This skill supports two modes:
 
 ---
 
+## Prerequisites
+
+Before running the demo from a fresh setup:
+
+1. The agent wallet must already be registered in the ERC-8004 Identity Registry.
+2. The OnlyAgent contract must know the agent's ERC-8004 `agentId`.
+3. If OnlyAgent was freshly deployed, the agent owner must approve the OnlyAgent contract as an operator for that ERC-8004 agent identity before validation-backed execution can succeed.
+
+Required setup state:
+
+- ERC-8004 registration exists for the agent wallet
+- `setAgentId(agentWallet, agentId)` has been called on OnlyAgent
+- `setApprovalForAll(onlyAgentAddress, true)` has been called on the ERC-8004 Identity Registry by the agent owner when needed
+
 ## Run the demo
 
 If AGENT_ADDRESS is not set, ask the user for their agent wallet address.
+
+If the demo is being run from a fresh deployment, first verify:
+- the agent is ERC-8004 registered
+- the current OnlyAgent contract has the correct `agentId` mapped
+- operator approval has been granted for the current OnlyAgent contract
+
 
 Execution Proof mode:
 cd ~/onlyagent && AGENT_ADDRESS=<agent-address> node scripts/agent.js
