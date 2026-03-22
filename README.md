@@ -514,8 +514,7 @@ scripts/
   agent.js              # proof pipeline + agent-layer decision gating
   deploy.js             # deployment script
 skills/
-  onlyagent-demo/       # OpenClaw skill — lets TerriClaw run the demo
-  onlyagent/            # OpenClaw SDK skill for other agents
+  onlyagent-demo/       # OpenClaw skill — canonical 4-case demo
 leaderboard/            # live agent reputation UI (GitHub Pages)
 ```
 
