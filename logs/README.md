@@ -4,9 +4,9 @@
 Canonical 4-case demo used for hackathon submission.
 
 - demo-case1-execution.json → execution proof baseline (submitted)
-- demo-case2-decision-deny.json → decision NO (not submitted)
+- demo-case2-decision-denied.json → decision NO (not submitted)
 - demo-case3-trust-pass.json → decision YES + trusted agent (submitted)
-- demo-case4-trust-fail.json → decision YES + untrusted agent (blocked)
+- demo-case4-trust-fail.json → decision YES but blocked due to low ERC-8004 reputation (trust-gated execution)
 
 This demonstrates:
 - Venice TEE execution proof
