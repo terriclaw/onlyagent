@@ -729,3 +729,171 @@ This is the cleanest expression of OnlyAgent’s final design:
 - `logs/demo-case4-trust-fail.json`
 
 These are the final raw receipts for hackathon submission.
+
+---
+
+## Session 13 — ERC-8004 Validation Registry Integration, Reproducible Skill Flow, and Final Canonical Demo
+
+**Goal:**
+Close the last major ERC-8004 gap by integrating the Validation Registry, then rerun the entire demo stack on the new validation-enabled deployment and update all public-facing artifacts so a fresh agent or judge could reproduce the flow cleanly.
+
+### Validation Registry integration
+
+After reviewing the ERC-8004 specification and best-practices guidance, it became clear that OnlyAgent already aligned strongly with ERC-8004 identity and application-specific trust policy, but still lacked native use of the Validation Registry.
+
+To close that gap:
+
+- a new `ValidationRegistry.sol` contract was added
+- `AgentGated.sol` was extended so successful execution flows also emit standardized validation signals
+- `OnlyAgent.sol` was redeployed against the new validation-enabled stack
+- the existing `AgentReputation` contract was intentionally preserved to keep real reputation history intact
+- the live ERC-8004 Identity Registry remained external and unchanged
+
+This preserved the real system state while upgrading OnlyAgent from:
+- execution proof + trust gating
+
+to:
+- execution proof + trust gating + ERC-8004 validation signaling
+
+### New deployed contracts
+
+**Base Mainnet**
+- OnlyAgent: `0x0485c9867a3Ecac90380C335347eaF5791A0A776`
+- AgentReputation: `0xB5e35148d21C630faafB10eBF20AE455635B3aE1` (reused)
+- ValidationRegistry: `0xb28C303A15f50d5508c2101Dd6a08730BDF1FfE5`
+- ERC-8004 Identity Registry: `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`
+
+### Wiring and setup steps completed
+
+Because OnlyAgent was redeployed while AgentReputation and the ERC-8004 registry remained live, several setup actions were required:
+
+1. Linked the new OnlyAgent contract to the existing AgentReputation contract
+2. Resolved TerriClaw’s live ERC-8004 `agentId` on Base (`31348`)
+3. Set `agentId` on the new OnlyAgent deployment
+4. Approved the new OnlyAgent contract as an operator for the ERC-8004 agent identity
+5. Confirmed that validation request/response logs were emitted through the Validation Registry on successful execution
+
+**Operator approval TX:**
+`0x220653b6ff0bce785f7b9f53f31aaf0a70086edbcdf5738ac436bd2bbaf9d249`
+
+This approval was critical because the validation-enabled flow required OnlyAgent to act as an authorized operator for the ERC-8004 identity during registry interactions.
+
+### Documentation and reproducibility pass
+
+A full consistency pass was then completed across the repo:
+
+- README updated to reflect the new OnlyAgent and ValidationRegistry addresses
+- README updated to describe ERC-8004 validation flow explicitly
+- README live demo section updated to point at the new canonical validated execution
+- `agent/agent.json` updated to the new OnlyAgent address
+- `.env.example` updated and deduplicated
+- helper scripts updated to the new deployment
+- leaderboard copy updated to reflect Base-only active scope
+- the `onlyagent-demo` skill was revised to be understandable and executable by a fresh agent with no prior context
+
+### Skill improvements
+
+The demo skill was substantially improved so a new agent or judge could execute it without relying on hidden assumptions.
+
+Added or clarified:
+- prerequisites
+- ERC-8004 setup requirements
+- conceptual verification guide
+- current OnlyAgent address
+- submission network and timing
+- exact command format
+- distinction between decision failure vs trust failure
+- clarification that `validationRequest(...)` and `validationResponse(...)` happen automatically inside OnlyAgent
+
+The skill now documents a reproducible path for:
+- execution proof
+- decision denial
+- decision approval with trust pass
+- decision approval with trust fail
+
+### Final canonical demo rerun on validation-enabled OnlyAgent
+
+After the validation integration and documentation pass, the full 4-case demo was rerun end-to-end on the new OnlyAgent deployment.
+
+### Case 1 — Execution Proof baseline
+- trusted agent: `0x0457B3DED2BA9E56520B21735f4324F6533F93ff`
+- mode: `prove`
+- result: submitted and confirmed
+- Base TX: `0x973cd1767e69a742319c9c07c8cadfa6eeef9fa6c9ba86fb87c2ab0d29aeeeca`
+- block: `43685437`
+
+### Case 2 — Decision denied
+- trusted agent: `0x0457B3DED2BA9E56520B21735f4324F6533F93ff`
+- mode: `decision`
+- prompt: explicit policy violation
+- visible response: `NO`
+- result: `do_not_submit`
+- no transaction submitted
+
+### Case 3 — Private treasury decision approved + trust pass
+- trusted agent: `0x0457B3DED2BA9E56520B21735f4324F6533F93ff`
+- mode: `decision`
+- private treasury prompt with:
+  - treasury balance: `$4.2M`
+  - monthly burn: `$380k`
+  - proposed transfer: `$1.5M`
+  - policy: maintain at least 6 months runway
+- visible response: `YES`
+- trust status: `trusted`
+- result: submitted and confirmed
+- Base TX: `0x1a17fd5550584c4abeba9676a868153941781f2e1edd94b08d8b92fde8b858e2`
+- block: `43685452`
+
+### Case 4 — Private treasury decision approved + trust fail
+- registered but low-trust agent: `0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1`
+- mode: `decision`
+- same treasury prompt as Case 3
+- visible response: `YES`
+- trust score: `0`
+- trust status: `low_trust`
+- result: `do_not_submit`
+- no transaction submitted
+
+### Validation Registry result
+
+The successful validation-enabled execution path was verified onchain:
+
+- `ValidationRequest` emitted ✅
+- `ValidationResponse` emitted ✅
+- validation tied to the new OnlyAgent deployment ✅
+
+This confirmed that OnlyAgent now participates in ERC-8004 not only through identity and trust policy, but also through standardized validation signaling.
+
+### Final canonical artifacts
+
+**Canonical demo logs**
+- `logs/demo-case1-execution.json`
+- `logs/demo-case2-decision-denied.json`
+- `logs/demo-case3-trust-pass.json`
+- `logs/demo-case4-trust-fail.json`
+
+**Raw final run logs**
+- `logs/run-1774160210.json`
+- `logs/run-1774160231.json`
+- `logs/run-1774160242.json`
+- `logs/run-1774160259.json`
+
+These now represent the final judge-facing evidence set for the project.
+
+### Final architecture after Session 13
+
+OnlyAgent now cleanly expresses four layers:
+
+- **Identity** — ERC-8004 registered agent identity
+- **Execution truth** — Venice TEE execution proven onchain
+- **Decision truth** — deterministic visible-output policy enforced at the agent layer
+- **Trust truth** — reputation-gated submission using ERC-8004-linked reputation
+- **Validation signaling** — standardized ERC-8004 validation events emitted onchain
+
+This is the strongest final form of the project:
+- private cognition
+- verifiable execution
+- deterministic decision gating
+- trust-gated execution
+- public validation trail
+

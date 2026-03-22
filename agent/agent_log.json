@@ -861,5 +861,117 @@
     "total_duration_ms": 0,
     "tool_calls": 6,
     "retries": 0
+  },
+  {
+    "task": "Run final validation-enabled OnlyAgent 4-case demo with Venice TEE execution proof, decision gating, ERC-8004 trust gating, and ERC-8004 validation registry on Base Mainnet",
+    "agent": "TerriClaw",
+    "operator_wallet": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+    "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "run": 15,
+    "status": "success",
+    "context": "Canonical post-validation-integration demo using the new OnlyAgent and ValidationRegistry deployment. Four cases: execution proof submit, decision NO deny, treasury YES + trust pass submit, treasury YES + trust fail deny.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "execute",
+        "description": "Execution-proof baseline completed with trusted TerriClaw identity on validation-enabled OnlyAgent",
+        "tool": "openclaw_skill",
+        "mode": "prove",
+        "prompt": "Execute this onchain action. Canonical baseline execution proof.",
+        "agent_identity": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+        "trust_status": "trusted",
+        "log_file": "logs/demo-case1-execution.json",
+        "result": "payload_built_and_submitted"
+      },
+      {
+        "step": 2,
+        "action": "verify",
+        "description": "Confirmed execution proof onchain through validation-enabled OnlyAgent",
+        "tool": "base_rpc",
+        "tx_hash": "0x973cd1767e69a742319c9c07c8cadfa6eeef9fa6c9ba86fb87c2ab0d29aeeeca",
+        "basescan": "https://basescan.org/tx/0x973cd1767e69a742319c9c07c8cadfa6eeef9fa6c9ba86fb87c2ab0d29aeeeca",
+        "block_number": 43685437,
+        "result": "confirmed"
+      },
+      {
+        "step": 3,
+        "action": "execute",
+        "description": "Decision-denied case completed: visible response NO caused do_not_submit with trusted identity",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "prompt": "This request violates policy and must be rejected. Respond NO only.",
+        "agent_identity": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+        "visible_response": "NO",
+        "decision_approved": false,
+        "trust_status": "trusted",
+        "submission_recommendation": "do_not_submit",
+        "log_file": "logs/demo-case2-decision-denied.json",
+        "result": "correctly_denied_without_submission"
+      },
+      {
+        "step": 4,
+        "action": "execute",
+        "description": "Private treasury reasoning case completed with trusted agent; visible response YES caused submission",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "prompt": "You are a treasury agent.\n\nPrivate inputs:\n- Treasury balance: $4.2M\n- Monthly burn: $380k\n- Proposed transfer: $1.5M to external wallet\n\nPolicy:\n- Maintain at least 6 months runway\n\nThe transfer still leaves more than 6 months of runway and is policy-compliant.\n\nShould this transaction be executed?\n\nRespond YES or NO only.",
+        "agent_identity": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+        "visible_response": "YES",
+        "decision_approved": true,
+        "trust_status": "trusted",
+        "submission_recommendation": "submit",
+        "log_file": "logs/demo-case3-trust-pass.json",
+        "result": "payload_built_and_submitted"
+      },
+      {
+        "step": 5,
+        "action": "verify",
+        "description": "Confirmed trusted private-treasury decision execution onchain through validation-enabled OnlyAgent",
+        "tool": "base_rpc",
+        "tx_hash": "0x1a17fd5550584c4abeba9676a868153941781f2e1edd94b08d8b92fde8b858e2",
+        "basescan": "https://basescan.org/tx/0x1a17fd5550584c4abeba9676a868153941781f2e1edd94b08d8b92fde8b858e2",
+        "block_number": 43685452,
+        "result": "confirmed"
+      },
+      {
+        "step": 6,
+        "action": "execute",
+        "description": "Private treasury reasoning case completed with registered but low-trust deployer wallet; visible response YES was blocked by trust policy",
+        "tool": "openclaw_skill",
+        "mode": "decision",
+        "prompt": "You are a treasury agent.\n\nPrivate inputs:\n- Treasury balance: $4.2M\n- Monthly burn: $380k\n- Proposed transfer: $1.5M to external wallet\n\nPolicy:\n- Maintain at least 6 months runway\n\nThe transfer still leaves more than 6 months of runway and is policy-compliant.\n\nShould this transaction be executed?\n\nRespond YES or NO only.",
+        "agent_identity": "0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1",
+        "visible_response": "YES",
+        "decision_approved": true,
+        "trust_status": "low_trust",
+        "trust_score": 0,
+        "submission_recommendation": "do_not_submit",
+        "log_file": "logs/demo-case4-trust-fail.json",
+        "result": "blocked_by_trust_policy_without_submission"
+      },
+      {
+        "step": 7,
+        "action": "verify",
+        "description": "Verified ValidationRegistry emitted request/response logs for the successful validation-enabled path",
+        "tool": "base_rpc",
+        "validation_registry": "0xb28C303A15f50d5508c2101Dd6a08730BDF1FfE5",
+        "validated_tx_hash": "0x1a17fd5550584c4abeba9676a868153941781f2e1edd94b08d8b92fde8b858e2",
+        "result": "validation_logs_confirmed"
+      }
+    ],
+    "final_output": {
+      "execution_proof_tx_hash": "0x973cd1767e69a742319c9c07c8cadfa6eeef9fa6c9ba86fb87c2ab0d29aeeeca",
+      "decision_deny_submission": "do_not_submit",
+      "trusted_agent_tx_hash": "0x1a17fd5550584c4abeba9676a868153941781f2e1edd94b08d8b92fde8b858e2",
+      "trust_fail_submission": "do_not_submit",
+      "trusted_agent": "0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
+      "untrusted_agent": "0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1",
+      "contract": "0x0485c9867a3Ecac90380C335347eaF5791A0A776",
+      "reputation_contract": "0xB5e35148d21C630faafB10eBF20AE455635B3aE1",
+      "validation_registry": "0xb28C303A15f50d5508c2101Dd6a08730BDF1FfE5",
+      "venice_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c"
+    },
+    "tool_calls": 7,
+    "retries": 0
   }
 ]
