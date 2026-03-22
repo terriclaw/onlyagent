@@ -60,6 +60,18 @@ Required setup state:
 
 If any of these are missing, do **not** run the demo yet. Fix setup first.
 
+Verification guide (conceptual checks):
+
+- ERC-8004 registration:
+  → the agent wallet must own an ERC-8004 identity (non-zero balance)
+
+- agentId mapping:
+  → OnlyAgent must return a non-zero `agentId` for the agent wallet
+
+- operator approval:
+  → ERC-8004 registry must report OnlyAgent as an approved operator for the agent wallet
+
+
 ## First-time runner notes
 
 This skill assumes the deployment already exists on **Base Mainnet** and that the current OnlyAgent contract is:
@@ -87,6 +99,10 @@ Required environment variable:
 
 - `AGENT_ADDRESS=<agent-wallet-address>`
 
+For trust test cases:
+- trusted agent example: `0x0457b3ded2ba9e56520b21735f4324f6533f93ff`
+- untrusted agent example: `0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1`
+
 Execution Proof mode:
 `cd ~/onlyagent && AGENT_ADDRESS=<agent-address> node scripts/agent.js "<prompt>"`
 
@@ -110,7 +126,8 @@ Submission details:
 - Network: Base Mainnet
 - chainId: `8453`
 - Recipient contract: `0x0485c9867a3Ecac90380C335347eaF5791A0A776`
-- Submit immediately after payload generation so the 2-minute freshness window does not expire
+- Submit within ~30 seconds of payload generation
+- The proof expires after ~2 minutes and will be rejected if submitted too late
 
 ---
 
