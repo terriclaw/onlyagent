@@ -11,8 +11,13 @@ async function main() {
   console.log("Balance:", ethers.formatEther(balance), "ETH");
 
   const reputationAddress = process.env.AGENT_REPUTATION_ADDRESS;
+  const validationRegistryAddress = process.env.VALIDATION_REGISTRY_ADDRESS;
+
   if (!reputationAddress) {
     throw new Error("Missing AGENT_REPUTATION_ADDRESS in .env");
+  }
+  if (!validationRegistryAddress) {
+    throw new Error("Missing VALIDATION_REGISTRY_ADDRESS in .env");
   }
 
   // Deploy OnlyAgent
@@ -27,6 +32,7 @@ async function main() {
   const onlyAgent = await OnlyAgent.deploy(
     process.env.ERC8004_IDENTITY_REGISTRY,
     reputationAddress,
+    validationRegistryAddress,
     [process.env.TEE_SIGNER_ADDRESS]
   );
 

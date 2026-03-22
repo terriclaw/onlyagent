@@ -4,7 +4,6 @@ pragma solidity ^0.8.20;
 import "./AgentGated.sol";
 
 contract OnlyAgent is AgentGated {
-
     event RealAgentProved(
         address indexed agent,
         uint256 newScore,
@@ -15,8 +14,9 @@ contract OnlyAgent is AgentGated {
     constructor(
         address _erc8004Registry,
         address _reputation,
+        address _validationRegistry,
         address[] memory _teeProviders
-    ) AgentGated(_erc8004Registry, _reputation, _teeProviders) {}
+    ) AgentGated(_erc8004Registry, _reputation, _validationRegistry, _teeProviders) {}
 
     function prove(
         bytes32 promptHash,
@@ -28,6 +28,21 @@ contract OnlyAgent is AgentGated {
         onlyAgent(promptHash, responseHash, timestamp, teeSignature)
         returns (string memory)
     {
+        bytes32 requestHash = _validationRequestHash(
+            promptHash,
+            responseHash,
+            msg.sender,
+            timestamp
+        );
+
+        validationRegistry.validationResponse(
+            requestHash,
+            100,
+            "",
+            bytes32(0),
+            "tee-attestation"
+        );
+
         (
             uint256 score,
             ,

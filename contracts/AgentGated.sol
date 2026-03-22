@@ -19,6 +19,23 @@ interface IAgentReputation {
     );
 }
 
+interface IValidationRegistry {
+    function validationRequest(
+        address validatorAddress,
+        uint256 agentId,
+        string calldata requestURI,
+        bytes32 requestHash
+    ) external;
+
+    function validationResponse(
+        bytes32 requestHash,
+        uint8 response,
+        string calldata responseURI,
+        bytes32 responseHash,
+        string calldata tag
+    ) external;
+}
+
 abstract contract AgentGated {
     using ECDSA for bytes32;
     using Strings for uint256;
@@ -26,24 +43,30 @@ abstract contract AgentGated {
     address public owner;
     IERC8004 public immutable erc8004Registry;
     IAgentReputation public immutable reputation;
+    IValidationRegistry public immutable validationRegistry;
 
     mapping(address => bool) public trustedTEEProviders;
     mapping(bytes32 => bool) public usedNonces;
+    mapping(address => uint256) public agentIds;
 
     uint256 public proofValidityWindow = 2 minutes;
 
     event AgentVerified(address indexed agent, address indexed contractAddress, uint256 timestamp);
     event TEEProviderAdded(address indexed provider);
     event TEEProviderRemoved(address indexed provider);
+    event AgentIdSet(address indexed agent, uint256 indexed agentId);
 
     constructor(
         address _erc8004Registry,
         address _reputation,
+        address _validationRegistry,
         address[] memory _teeProviders
     ) {
         owner = msg.sender;
         erc8004Registry = IERC8004(_erc8004Registry);
         reputation = IAgentReputation(_reputation);
+        validationRegistry = IValidationRegistry(_validationRegistry);
+
         for (uint256 i = 0; i < _teeProviders.length; i++) {
             trustedTEEProviders[_teeProviders[i]] = true;
             emit TEEProviderAdded(_teeProviders[i]);
@@ -65,9 +88,13 @@ abstract contract AgentGated {
         emit TEEProviderRemoved(provider);
     }
 
-    /// @dev Produces 64-char lowercase hex with no 0x prefix.
-    ///      MUST match the exact format Venice uses in its signed text field.
-    ///      Verify by checking sigPayload.text in agent.js before deploying.
+    function setAgentId(address agent, uint256 agentId) external onlyOwner {
+        require(agent != address(0), "OnlyAgent: bad agent");
+        require(agentId > 0, "OnlyAgent: bad agentId");
+        agentIds[agent] = agentId;
+        emit AgentIdSet(agent, agentId);
+    }
+
     function _hexStringNoPrefix(bytes32 value) internal pure returns (string memory) {
         bytes memory alphabet = "0123456789abcdef";
         bytes memory out = new bytes(64);
@@ -79,8 +106,6 @@ abstract contract AgentGated {
         return string(out);
     }
 
-    /// @dev Reconstruct Venice's signed text: "{promptHash}:{responseHash}"
-    ///      where each hash is 64 lowercase hex chars (no 0x prefix).
     function _veniceSignedText(bytes32 promptHash, bytes32 responseHash)
         internal pure returns (bytes memory)
     {
@@ -91,48 +116,71 @@ abstract contract AgentGated {
         )));
     }
 
+    function _validationRequestHash(
+        bytes32 promptHash,
+        bytes32 responseHash,
+        address agent,
+        uint256 timestamp
+    ) internal view returns (bytes32) {
+        return keccak256(
+            abi.encode(
+                promptHash,
+                responseHash,
+                agent,
+                address(this),
+                timestamp,
+                block.chainid
+            )
+        );
+    }
+
     modifier onlyAgent(
         bytes32 promptHash,
         bytes32 responseHash,
         uint256 timestamp,
         bytes memory teeSignature
     ) {
-        // 1. ERC-8004 agent identity
         require(
             erc8004Registry.balanceOf(msg.sender) > 0,
             "OnlyAgent: not a registered agent"
         );
 
-        // 2. Freshness
         require(timestamp <= block.timestamp, "OnlyAgent: proof from future");
         require(
             block.timestamp <= timestamp + proofValidityWindow,
             "OnlyAgent: proof expired"
         );
 
-        // 3. Replay protection — binds Venice proof to this specific action context
-        bytes32 replayKey = keccak256(abi.encodePacked(
+        bytes32 requestHash = _validationRequestHash(
             promptHash,
             responseHash,
             msg.sender,
-            address(this),
-            timestamp,
-            block.chainid
-        ));
-        require(!usedNonces[replayKey], "OnlyAgent: proof already used");
-        usedNonces[replayKey] = true;
+            timestamp
+        );
 
-        // 4. Verify Venice personal_sign(promptHash:responseHash) directly
+        require(!usedNonces[requestHash], "OnlyAgent: proof already used");
+        usedNonces[requestHash] = true;
+
+        // Venice signs EXACTLY: "{promptHash}:{responseHash}"
+        // 64 hex chars + ":" + 64 hex chars (no 0x prefix)
+        // Total length = 129 bytes
+        // EIP-191 prefix length MUST match this exact encoding
+        // If Venice changes format, verification will fail
         bytes memory veniceText = _veniceSignedText(promptHash, responseHash);
         bytes32 ethSignedHash = keccak256(abi.encodePacked(
             "\x19Ethereum Signed Message:\n",
             Strings.toString(veniceText.length),
             veniceText
         ));
+
         address signer = ECDSA.recover(ethSignedHash, teeSignature);
         require(trustedTEEProviders[signer], "OnlyAgent: untrusted TEE provider");
 
-        // 5. Reputation
+        uint256 agentId = agentIds[msg.sender];
+        require(agentId > 0, "OnlyAgent: agentId not set");
+
+        validationRegistry.validationRequest(address(this), agentId, "", requestHash);
+
         reputation.recordAction(msg.sender, address(this));
         emit AgentVerified(msg.sender, address(this), block.timestamp);
 
