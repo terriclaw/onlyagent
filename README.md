@@ -302,8 +302,9 @@ This is the correct architecture under current TEE signing semantics.
 
 | Contract | Address |
 |---|---|
-| OnlyAgent (demo) | `0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D` |
+| OnlyAgent (demo) | `0x0485c9867a3Ecac90380C335347eaF5791A0A776` |
 | AgentReputation | `0xB5e35148d21C630faafB10eBF20AE455635B3aE1` |
+| ValidationRegistry | `0xb28C303A15f50d5508c2101Dd6a08730BDF1FfE5` |
 | ERC-8004 Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
 
 ---
@@ -345,6 +346,18 @@ OnlyAgent produces real, inspectable transactions on Base:
 - agent actions update onchain reputation
 - success and refusal cases are both documented with raw logs
 
+### ERC-8004 Validation Registry
+
+OnlyAgent now records TEE-backed execution validation through an ERC-8004-compatible `ValidationRegistry`.
+
+For a validated execution:
+
+- `validationRequest(...)` is created for the acting `agentId`
+- OnlyAgent verifies the Venice TEE proof onchain
+- `validationResponse(..., 100, ..., "tee-attestation")` is recorded on success
+
+This makes OnlyAgent not just an execution gate, but a **TEE validator** that publishes standardized validation signals onchain.
+
 ### What makes this an ERC-8004 project
 
 OnlyAgent does not just register an agent identity.  
@@ -378,7 +391,8 @@ This makes OnlyAgent not just an AI demo, but a **verifiable trusted-agent syste
 
 
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
-- 🔗 [Execution Proof TX](https://basescan.org/tx/0x27a3031e7306eb1d7e9f4f2f12a129693198f2fa944050e400c564f83403892d) — final baseline prove() demo on Base Mainnet
+- 🔗 [Validated Execution TX](https://basescan.org/tx/0x8a7ca9ece3213b1ccde2383f49fce484083e657ba4b7e92cef2b6da134bf981a) — TEE-verified execution + ERC-8004 validation recorded onchain
+- 🔗 [Operator Approval TX](https://basescan.org/tx/0x220653b6ff0bce785f7b9f53f31aaf0a70086edbcdf5738ac436bd2bbaf9d249) — OnlyAgent approved as operator for ERC-8004 agent
 - 🔗 [Decision YES TX](https://basescan.org/tx/0x2d9053d7e838a2561fa8f62f1d3f44e76468f4c2e9393e57bc01b2e5398d7b8b) — final decision-approved demo on Base Mainnet
 - 🔗 [Trust Fail Case (Raw Logs)](https://github.com/terriclaw/onlyagent/tree/master/logs) — decision YES but execution blocked due to low ERC-8004 reputation
 - 📄 Logs — full 4-case demo including trust pass + trust fail (`logs/`)
