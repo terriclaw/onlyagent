@@ -42,7 +42,7 @@
   "erc8004_registration_reference": "https://basescan.org/address/0x0457B3DED2BA9E56520B21735f4324F6533F93ff",
   "contracts": {
     "base_mainnet": {
-      "onlyagent": "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D",
+      "onlyagent": "0x0485c9867a3Ecac90380C335347eaF5791A0A776",
       "reputation": "0xB5e35148d21C630faafB10eBF20AE455635B3aE1",
       "erc8004_registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
       "venice_tee_signer": "0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c"

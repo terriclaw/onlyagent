@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import "dotenv/config";
 
 const IDENTITY_REGISTRY = "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432";
-const ONLYAGENT_CONTRACT = "0xED7d4E118f04335E3b2d9105FE1D8F83DD464C0D";
+const ONLYAGENT_CONTRACT = "0x0485c9867a3Ecac90380C335347eaF5791A0A776";
 const TERRICLAW = "0x0457b3ded2ba9e56520b21735f4324f6533f93ff";
 const BASE_RPC = process.env.BASE_RPC_URL || "https://mainnet.base.org";
 
