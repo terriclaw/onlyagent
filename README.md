@@ -53,7 +53,7 @@ This is the final architecture used in the current Base Mainnet demo.
 ---
 
 
-## V1 → V3 Evolution
+## V1 → V4 Evolution
 
 OnlyAgent evolved into a four-layer enforcement system:
 
@@ -221,11 +221,12 @@ This is strictly stronger than:
 A valid TEE proof is **not enough**.  
 A visible `YES` decision is **not enough**.
 
-Execution now requires all three layers:
+Execution now requires all four layers:
 
 1. execution is valid
 2. decision is approved
 3. agent identity is trusted
+4. execution is recorded as a validation signal onchain
 
 ### Demonstrated behavior
 
@@ -397,7 +398,7 @@ This makes OnlyAgent not just an AI demo, but a **verifiable trusted-agent syste
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
 - 🔗 [Validated Execution TX](https://basescan.org/tx/0x8a7ca9ece3213b1ccde2383f49fce484083e657ba4b7e92cef2b6da134bf981a) — TEE-verified execution + ERC-8004 validation recorded onchain
 - 🔗 [Operator Approval TX](https://basescan.org/tx/0x220653b6ff0bce785f7b9f53f31aaf0a70086edbcdf5738ac436bd2bbaf9d249) — OnlyAgent approved as operator for ERC-8004 agent
-- 🔗 [Decision YES TX](https://basescan.org/tx/0x1a17fd5550584c4abeba9676a868153941781f2e1edd94b08d8b92fde8b858e2) — final decision-approved demo on Base Mainnet
+- 🔗 [Decision YES TX](https://basescan.org/tx/0x1a17fd5550584c4abeba9676a868153941781f2e1edd94b08d8b92fde8b858e2) — treasury decision approved + trust pass — Case 3 canonical demo
 - 🔗 [Trust Fail Case (Raw Logs)](https://github.com/terriclaw/onlyagent/tree/master/logs) — decision YES but execution blocked due to low ERC-8004 reputation
 - 📄 Logs — full 4-case demo including trust pass + trust fail (`logs/`)
 
