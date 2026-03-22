@@ -46,39 +46,71 @@ This skill supports two modes:
 
 ## Prerequisites
 
-Before running the demo from a fresh setup:
+Before running the demo from a fresh setup, verify these are already true:
 
-1. The agent wallet must already be registered in the ERC-8004 Identity Registry.
-2. The OnlyAgent contract must know the agent's ERC-8004 `agentId`.
-3. If OnlyAgent was freshly deployed, the agent owner must approve the OnlyAgent contract as an operator for that ERC-8004 agent identity before validation-backed execution can succeed.
+1. The agent wallet is already registered in the ERC-8004 Identity Registry.
+2. The current OnlyAgent contract already has the correct ERC-8004 `agentId` mapped for that wallet.
+3. The current OnlyAgent contract has already been approved as an operator for that ERC-8004 agent identity when required.
 
 Required setup state:
 
 - ERC-8004 registration exists for the agent wallet
-- `setAgentId(agentWallet, agentId)` has been called on OnlyAgent
-- `setApprovalForAll(onlyAgentAddress, true)` has been called on the ERC-8004 Identity Registry by the agent owner when needed
+- `setAgentId(agentWallet, agentId)` has already been called on OnlyAgent
+- `setApprovalForAll(onlyAgentAddress, true)` has already been called on the ERC-8004 Identity Registry by the agent owner when needed
+
+If any of these are missing, do **not** run the demo yet. Fix setup first.
+
+## First-time runner notes
+
+This skill assumes the deployment already exists on **Base Mainnet** and that the current OnlyAgent contract is:
+
+- `0x0485c9867a3Ecac90380C335347eaF5791A0A776`
+
+Validation flow is automatic:
+
+- the agent does **not** call `validationRequest(...)` or `validationResponse(...)` directly
+- those calls happen automatically inside OnlyAgent when a submitted transaction succeeds
+
+Submission network:
+
+- Base Mainnet
+- chainId `8453`
+
+Case meanings:
+
+- **Case 2** = decision fails because Venice returns `NO`
+- **Case 4** = decision passes because Venice returns `YES`, but trust fails because the agent identity has low reputation
 
 ## Run the demo
 
-If AGENT_ADDRESS is not set, ask the user for their agent wallet address.
+Required environment variable:
 
-If the demo is being run from a fresh deployment, first verify:
-- the agent is ERC-8004 registered
-- the current OnlyAgent contract has the correct `agentId` mapped
-- operator approval has been granted for the current OnlyAgent contract
-
+- `AGENT_ADDRESS=<agent-wallet-address>`
 
 Execution Proof mode:
-cd ~/onlyagent && AGENT_ADDRESS=<agent-address> node scripts/agent.js
+`cd ~/onlyagent && AGENT_ADDRESS=<agent-address> node scripts/agent.js "<prompt>"`
 
 Decision mode:
-cd ~/onlyagent && ONLYAGENT_MODE=decision AGENT_ADDRESS=<agent-address> node scripts/agent.js
+`cd ~/onlyagent && AGENT_ADDRESS=<agent-address> ONLYAGENT_MODE=decision node scripts/agent.js "<prompt>"`
 
-Immediate submission is required only when the script returns a non-null `tx` payload.
+Use the exact prompts from the test sequence below.
 
-If `submissionRecommendation = do_not_submit`, skip submission and report the denied outcome.
+Submission rule:
 
-If the OnlyAgent contract has been freshly redeployed, the ERC-8004 agent owner may need to approve the new OnlyAgent contract as an operator before validation-backed execution can succeed.
+- if `"tx"` is non-null **and** `submissionRecommendation = "submit"` → submit the payload immediately on Base Mainnet
+- if `"tx"` is null **and** `submissionRecommendation = "do_not_submit"` → do not submit anything
+
+Validation note:
+
+- `validationRequest(...)` and `validationResponse(...)` happen automatically inside OnlyAgent during successful validated execution
+- the agent running this skill does not call those functions directly
+
+Submission details:
+
+- Network: Base Mainnet
+- chainId: `8453`
+- Recipient contract: `0x0485c9867a3Ecac90380C335347eaF5791A0A776`
+- Submit immediately after payload generation so the 2-minute freshness window does not expire
 
 ---
 
@@ -177,10 +209,12 @@ Execute these four cases in order using EXACT prompts:
    - submit
 
 4. **Decision approved + trust fail**
+   - this case tests trust failure, not decision failure
    - agent: 0x1886ec8F936927c0a7E9296d8beB22d6f25C3ee1
    - prompt: same as case 3
    - run `ONLYAGENT_MODE=decision`
    - must produce visible response `YES`
+   - expected outcome: decision passes, but trust policy denies submission
    - do not submit due to trust failure
 
 For all cases:
