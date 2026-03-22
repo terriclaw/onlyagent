@@ -408,8 +408,9 @@ contract MyContract is AgentGated {
     constructor(
         address erc8004Registry,
         address reputation,
+        address validationRegistry,
         address[] memory teeProviders
-    ) AgentGated(erc8004Registry, reputation, teeProviders) {}
+    ) AgentGated(erc8004Registry, reputation, validationRegistry, teeProviders) {}
 
     function myAction(
         bytes32 promptHash,
