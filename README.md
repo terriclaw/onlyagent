@@ -46,6 +46,7 @@ This means:
 - the contract proves **execution truth**
 - the agent enforces **decision truth**
 - the agent enforces **trust truth**
+- the ValidationRegistry records **validation truth**
 
 This is the final architecture used in the current Base Mainnet demo.
 
@@ -54,7 +55,7 @@ This is the final architecture used in the current Base Mainnet demo.
 
 ## V1 → V3 Evolution
 
-OnlyAgent evolved into a three-layer enforcement system:
+OnlyAgent evolved into a four-layer enforcement system:
 
 - **V1 — Execution Proof**
   - The contract verifies Venice TEE execution onchain via `prove()`
@@ -65,6 +66,9 @@ OnlyAgent evolved into a three-layer enforcement system:
   - The agent only submits if the decision policy passes
 
 - **V3 — Trust Policy**
+- **V4 — Validation Signaling**
+  - Successful executions emit ERC-8004-compatible validation events
+  - The ValidationRegistry records that a TEE-backed execution was verified onchain
   - The agent runtime checks ERC-8004-linked reputation before submission
   - Even a valid `YES` decision can still be blocked if the acting identity is low-trust
 
@@ -393,7 +397,7 @@ This makes OnlyAgent not just an AI demo, but a **verifiable trusted-agent syste
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
 - 🔗 [Validated Execution TX](https://basescan.org/tx/0x8a7ca9ece3213b1ccde2383f49fce484083e657ba4b7e92cef2b6da134bf981a) — TEE-verified execution + ERC-8004 validation recorded onchain
 - 🔗 [Operator Approval TX](https://basescan.org/tx/0x220653b6ff0bce785f7b9f53f31aaf0a70086edbcdf5738ac436bd2bbaf9d249) — OnlyAgent approved as operator for ERC-8004 agent
-- 🔗 [Decision YES TX](https://basescan.org/tx/0x2d9053d7e838a2561fa8f62f1d3f44e76468f4c2e9393e57bc01b2e5398d7b8b) — final decision-approved demo on Base Mainnet
+- 🔗 [Decision YES TX](https://basescan.org/tx/0x1a17fd5550584c4abeba9676a868153941781f2e1edd94b08d8b92fde8b858e2) — final decision-approved demo on Base Mainnet
 - 🔗 [Trust Fail Case (Raw Logs)](https://github.com/terriclaw/onlyagent/tree/master/logs) — decision YES but execution blocked due to low ERC-8004 reputation
 - 📄 Logs — full 4-case demo including trust pass + trust fail (`logs/`)
 
@@ -502,6 +506,7 @@ contracts/
   AgentGated.sol        # abstract base — inherit this in your contract
   AgentReputation.sol   # onchain reputation registry
   OnlyAgent.sol         # demo contract with prove()
+  ValidationRegistry.sol # ERC-8004 validation signaling
 scripts/
   agent.js              # proof pipeline + agent-layer decision gating
   deploy.js             # deployment script
@@ -521,6 +526,7 @@ AGENT_ADDRESS=            # ERC-8004 registered agent wallet address
 TEE_SIGNER_ADDRESS=       # live Venice signer for trustedTEEProviders (0xc4045be3413B0B30ad0295985fe5e037Dc0EeB0c)
 ONLY_AGENT_ADDRESS=       # deployed OnlyAgent contract
 AGENT_REPUTATION_ADDRESS= # deployed AgentReputation contract
+VALIDATION_REGISTRY_ADDRESS= # deployed ValidationRegistry contract
 BASE_RPC_URL=             # Base RPC (default: https://mainnet.base.org)
 ```
 
