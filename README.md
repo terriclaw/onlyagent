@@ -45,6 +45,7 @@ OnlyAgent now has a clean separation of concerns:
 This means:
 - the contract proves **execution truth**
 - the agent enforces **decision truth**
+- the agent enforces **trust truth**
 
 This is the final architecture used in the current Base Mainnet demo.
 
