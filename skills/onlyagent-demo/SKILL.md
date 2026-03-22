@@ -37,6 +37,8 @@ This skill supports two modes:
 - Logs the visible plaintext response and decision outcome
 - Evaluates ERC-8004-linked reputation (score, recency, contract diversity)
 - Builds a transaction payload for OnlyAgent on Base
+- Submits through a Validation Registry–enabled OnlyAgent flow
+- Records standardized validation signals onchain through `validationRequest(...)` and `validationResponse(...)`
 - The harness submits the payload using its own wallet
 - Only succeeds if all onchain and agent-layer checks pass
 
@@ -55,6 +57,8 @@ cd ~/onlyagent && ONLYAGENT_MODE=decision AGENT_ADDRESS=<agent-address> node scr
 Immediate submission is required only when the script returns a non-null `tx` payload.
 
 If `submissionRecommendation = do_not_submit`, skip submission and report the denied outcome.
+
+If the OnlyAgent contract has been freshly redeployed, the ERC-8004 agent owner may need to approve the new OnlyAgent contract as an operator before validation-backed execution can succeed.
 
 ---
 
