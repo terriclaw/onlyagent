@@ -66,11 +66,12 @@ OnlyAgent evolved into a four-layer enforcement system:
   - The agent only submits if the decision policy passes
 
 - **V3 — Trust Policy**
+  - The agent runtime checks ERC-8004-linked reputation before submission
+  - Even a valid `YES` decision can still be blocked if the acting identity is low-trust
+
 - **V4 — Validation Signaling**
   - Successful executions emit ERC-8004-compatible validation events
   - The ValidationRegistry records that a TEE-backed execution was verified onchain
-  - The agent runtime checks ERC-8004-linked reputation before submission
-  - Even a valid `YES` decision can still be blocked if the acting identity is low-trust
 
 Execution now requires:
 
@@ -82,6 +83,7 @@ This progression is the core OnlyAgent design:
 - **V1 = execution truth**
 - **V2 = decision truth**
 - **V3 = trust truth**
+- **V4 = validation truth**
 
 ---
 
