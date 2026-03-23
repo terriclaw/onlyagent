@@ -1,10 +1,12 @@
 # OnlyAgent
 
+**We don’t ask you to trust the agent — we prove it executed.**
+
 A permission layer for **verifiable private AI agents onchain** — bridging Venice private cognition to trusted public actions.
 
 `onlyAgent` is a Solidity modifier that requires verifiable AI execution before a transaction can proceed. Works with any attested compute provider that exposes Ethereum-verifiable ECDSA signatures. The current Base Mainnet demo verifies signatures from Venice AI's live TEE signer directly onchain, while the agent runtime applies deterministic policy to the visible plaintext response before submission.
 
-OnlyAgent turns AI inference into a **first-class onchain requirement**: contracts can require proof that a private Venice TEE execution occurred before allowing state changes.
+OnlyAgent turns AI execution into a **contract-level permission boundary**: contracts can require proof that a private Venice TEE execution occurred before allowing state changes.
 
 🎥 **Demo (Slides + Live Execution):** https://youtu.be/pySdMDqsxbk
 
@@ -38,6 +40,8 @@ The contract only allows transfers if a valid Venice TEE execution proof is prov
 
 ## Final Architecture
 
+![Execution Flow](assets/images/onlyagent_execution_flow.png)
+
 OnlyAgent now has a clean separation of concerns:
 
 - **Contract layer** — verifies Venice TEE execution provenance onchain
@@ -53,6 +57,12 @@ This means:
 This is the final architecture used in the current Base Mainnet demo.
 
 ---
+
+## Execution + Trust Gate
+
+![Trust Gate Sequence](assets/images/onlyagent_trust_gate_sequence.png)
+
+This sequence shows the full runtime path: contract-level execution verification, followed by agent-layer trust and decision gating before submission.
 
 
 ## V1 → V4 Evolution
@@ -266,6 +276,8 @@ Protocols can treat autonomous agents differently from humans — with their own
 
 ## Private Inference → Verifiable Actions
 
+![Private Cognition to Verifiable Action](assets/images/onlyagent_privacy.png)
+
 OnlyAgent supports workflows where AI agents operate on sensitive data but must produce verifiable public actions.
 
 A Venice TEE model can process private inputs without exposing the prompt or response publicly. The enclave signs `personal_sign(promptHash:responseHash)`, producing a verifiable execution artifact.
@@ -441,6 +453,10 @@ contract MyContract is AgentGated {
 Every verified call increments the agent's score in AgentReputation, tracked by ERC-8004 identity across every contract that inherits AgentGated.
 
 ---
+
+## Slides
+
+- 📄 [Full Presentation](assets/slides/onlyagent_slides.pdf)
 
 ## Quickstart
 
