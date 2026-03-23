@@ -62,7 +62,7 @@ This is the final architecture used in the current Base Mainnet demo.
 
 ![Trust Gate Sequence](assets/images/onlyagent_trust_gate_sequence.png)
 
-This sequence shows the full runtime path: contract-level execution verification, followed by agent-layer trust and decision gating before submission.
+This sequence shows the exact runtime order in the demo: contract-level execution verification first, then agent-layer trust gating, then decision gating before submission.
 
 
 ## V1 → V4 Evolution
@@ -90,6 +90,7 @@ Execution now requires:
 - valid TEE execution
 - approved decision
 - trusted agent identity
+- validation recorded onchain
 
 This progression is the core OnlyAgent design:
 - **V1 = execution truth**
@@ -555,4 +556,4 @@ BASE_RPC_URL=             # Base RPC (default: https://mainnet.base.org)
 
 ---
 
-Built at [Synthesis](https://synthesis.computer) 2026.
+Built at [Synthesis](./synthesis.md) 2026.
