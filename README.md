@@ -556,4 +556,4 @@ BASE_RPC_URL=             # Base RPC (default: https://mainnet.base.org)
 
 ---
 
-Built at [Synthesis](./synthesis.md) 2026.
+Built at [Synthesis](https://synthesis.md) 2026.
