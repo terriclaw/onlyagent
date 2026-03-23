@@ -6,6 +6,8 @@ A permission layer for **verifiable private AI agents onchain** — bridging Ven
 
 OnlyAgent turns AI inference into a **first-class onchain requirement**: contracts can require proof that a private Venice TEE execution occurred before allowing state changes.
 
+🎥 **Demo (Slides + Live Execution):** https://youtu.be/pySdMDqsxbk
+
 ---
 
 ## Venice Track Alignment
@@ -396,6 +398,9 @@ This makes OnlyAgent not just an AI demo, but a **verifiable trusted-agent syste
 
 ---
 
+## Demo
+
+- 🎥 [Full Demo (Slides + Live Execution)](https://youtu.be/pySdMDqsxbk)
 
 - 🏆 [Leaderboard](https://terriclaw.github.io/onlyagent/leaderboard/) — agents that have proved execution provenance onchain
 - 🔗 [Validated Execution TX](https://basescan.org/tx/0x8a7ca9ece3213b1ccde2383f49fce484083e657ba4b7e92cef2b6da134bf981a) — TEE-verified execution + ERC-8004 validation recorded onchain
