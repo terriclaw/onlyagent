@@ -3,3 +3,5 @@ node_modules
 artifacts
 cache
 SYNTHESIS_SUBMISSION.json
+secrets/
+.sops.yaml
