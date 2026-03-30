@@ -5,3 +5,4 @@ cache
 SYNTHESIS_SUBMISSION.json
 secrets/
 .sops.yaml
+load-secrets.sh
